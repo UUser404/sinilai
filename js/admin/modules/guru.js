@@ -1,7 +1,7 @@
 /**
  * admin/modules/guru.js
- * GuruModule — CRUD data guru.
- * Hanya urusan: load, render, tambah, edit, hapus guru.
+ * GuruModule — CRUD data guru + akun kurikulum.
+ * Hanya urusan: load, render, tambah, edit, hapus guru/kurikulum.
  */
 class GuruModule {
   constructor() {
@@ -23,38 +23,49 @@ class GuruModule {
 
   render(data = this.data) {
     UI.$('guruBody').innerHTML = data.length
-      ? data.map(g => `
-          <tr>
-            <td class="name">${g.nama}</td>
-            <td><span class="badge gray">${g.username}</span></td>
-            <td>${g.mapel}</td>
-            <td>${g.kelas}</td>
-            <td><span class="badge ${g.status === 'Aktif' ? 'green' : 'gray'}">${g.status}</span></td>
-            <td><div style="display:flex;gap:6px">
-              <button class="btn btn-ghost btn-sm" onclick="Admin.guru.openEdit('${g.username}')">Edit</button>
-              <button class="btn btn-danger btn-sm" onclick="Admin.guru.confirmDelete('${g.username}')">Hapus</button>
-            </div></td>
-          </tr>`).join('')
-      : '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:40px">Belum ada data guru</td></tr>';
+      ? data.map(g => {
+          const isKuri = g.role === 'kurikulum';
+          return `
+            <tr>
+              <td class="name">${g.nama}</td>
+              <td><span class="badge gray">${g.username}</span></td>
+              <td>${isKuri ? '—' : (g.mapel || '—')}</td>
+              <td>${isKuri ? '—' : (g.kelas || '—')}</td>
+              <td>
+                <span class="badge ${isKuri ? 'amber' : 'blue'}" style="margin-right:4px">
+                  ${isKuri ? 'Kurikulum' : 'Guru'}
+                </span>
+                <span class="badge ${g.status === 'Aktif' ? 'green' : 'gray'}">${g.status}</span>
+              </td>
+              <td><div style="display:flex;gap:6px">
+                <button class="btn btn-ghost btn-sm" onclick="Admin.guru.openEdit('${g.username}')">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="Admin.guru.confirmDelete('${g.username}')">Hapus</button>
+              </div></td>
+            </tr>`;
+        }).join('')
+      : '<tr><td colspan="6" style="text-align:center;color:var(--text3);padding:40px">Belum ada data</td></tr>';
   }
 
   openAdd() {
     this._clearForm();
-    UI.$('modalGuruTitle').textContent = 'Tambah Guru Baru';
+    UI.$('modalGuruTitle').textContent = 'Tambah Akun Baru';
+    this._updateFormByRole('guru');
     openModal('modalGuru');
   }
 
   openEdit(username) {
     const g = this.data.find(x => x.username === username);
     if (!g) return;
-    UI.$('modalGuruTitle').textContent = 'Edit Data Guru';
-    UI.$('guruNama').value     = g.nama;
-    UI.$('guruUsername').value = g.username;
-    UI.$('guruNip').value      = g.nip || '';
-    UI.$('guruMapel').value    = g.mapel;
-    UI.$('guruKelas').value    = g.kelas;
-    UI.$('guruStatus').value   = g.status || 'Aktif';
-    UI.$('guruRole').value     = g.role   || 'guru';
+    UI.$('modalGuruTitle').textContent = 'Edit Data Akun';
+    UI.$('guruNama').value      = g.nama;
+    UI.$('guruUsername').value  = g.username;
+    UI.$('guruNip').value       = g.nip   || '';
+    UI.$('guruMapel').value     = g.mapel || '';
+    UI.$('guruKelas').value     = g.kelas || '';
+    UI.$('guruStatus').value    = g.status || 'Aktif';
+    UI.$('guruStatusAlt').value = g.status || 'Aktif';
+    UI.$('guruRole').value      = g.role   || 'guru';
+    this._updateFormByRole(g.role || 'guru');
     openModal('modalGuru');
   }
 
@@ -68,7 +79,8 @@ class GuruModule {
     try {
       const res = await (isEdit ? api.editGuru(payload) : api.addGuru(payload));
       if (res.status === 'ok') {
-        UI.showToast(`✓ Guru "${payload.nama}" berhasil ${isEdit ? 'diperbarui' : 'ditambahkan'}`, 'success');
+        const label = payload.role === 'kurikulum' ? 'Akun kurikulum' : 'Guru';
+        UI.showToast(`✓ ${label} "${payload.nama}" berhasil ${isEdit ? 'diperbarui' : 'ditambahkan'}`, 'success');
         closeModal('modalGuru');
         this._clearForm();
         await this.load();
@@ -83,12 +95,12 @@ class GuruModule {
   }
 
   async confirmDelete(username) {
-    if (!confirm(`Hapus guru "${username}"? Data tidak bisa dikembalikan.`)) return;
+    if (!confirm(`Hapus akun "${username}"? Data tidak bisa dikembalikan.`)) return;
     UI.showLoading();
     try {
       const res = await api.deleteGuru(username);
       if (res.status === 'ok') {
-        UI.showToast('Guru berhasil dihapus', 'info');
+        UI.showToast('Akun berhasil dihapus', 'info');
         await this.load();
       } else {
         UI.showToast('Gagal: ' + (res.message || 'Error'), 'error');
@@ -103,22 +115,36 @@ class GuruModule {
   // ── Private ───────────────────────────────────────────────
 
   _readForm() {
+    const role    = UI.$('guruRole').value;
+    const isGuru  = role === 'guru';
+    const status  = isGuru
+      ? UI.$('guruStatus').value
+      : (UI.$('guruStatusAlt')?.value || 'Aktif');
     return {
       nama:     UI.$('guruNama').value.trim(),
       username: UI.$('guruUsername').value.trim(),
       password: UI.$('guruPassword').value,
-      nip:      UI.$('guruNip').value.trim(),
-      mapel:    UI.$('guruMapel').value.trim(),
-      kelas:    UI.$('guruKelas').value.trim(),
-      status:   UI.$('guruStatus').value,
-      role:     UI.$('guruRole').value,
+      nip:      isGuru ? UI.$('guruNip').value.trim()   : '',
+      mapel:    isGuru ? UI.$('guruMapel').value.trim() : '',
+      kelas:    isGuru ? UI.$('guruKelas').value.trim() : '',
+      status,
+      role,
     };
   }
 
   _clearForm() {
     ['guruNama', 'guruUsername', 'guruPassword', 'guruNip', 'guruMapel', 'guruKelas']
-      .forEach(id => UI.$(id).value = '');
-    UI.$('guruStatus').value = 'Aktif';
-    UI.$('guruRole').value   = 'guru';
+      .forEach(id => { if (UI.$(id)) UI.$(id).value = ''; });
+    UI.$('guruStatus').value    = 'Aktif';
+    UI.$('guruStatusAlt').value = 'Aktif';
+    UI.$('guruRole').value      = 'guru';
+    this._updateFormByRole('guru');
+  }
+
+  _updateFormByRole(role) {
+    const isGuru  = role === 'guru';
+    UI.$('guruFieldsGuru').style.display   = isGuru ? '' : 'none';
+    UI.$('guruFieldsStatus').style.display = isGuru ? 'none' : '';
+    UI.$('guruSaveBtn').textContent = isGuru ? 'Simpan Guru' : 'Simpan Akun';
   }
 }

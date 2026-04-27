@@ -247,36 +247,55 @@
 <div class="modal-overlay" id="modalGuru">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title" id="modalGuruTitle">Tambah Guru Baru</span>
+      <span class="modal-title" id="modalGuruTitle">Tambah Akun Baru</span>
       <button class="modal-close" onclick="closeModal('modalGuru')">×</button>
     </div>
     <div class="modal-body">
+      <!-- Role selector di atas — menentukan field yang muncul -->
+      <div class="form-field" style="margin-bottom:16px">
+        <label>Role *</label>
+        <select id="guruRole" onchange="Admin.guru._updateFormByRole(this.value)">
+          <option value="guru">Guru</option>
+          <option value="kurikulum">Kurikulum</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <!-- Field wajib semua role -->
       <div class="form-row">
-        <div class="form-field"><label>Nama Lengkap *</label><input id="guruNama" placeholder="Nama guru..." /></div>
+        <div class="form-field"><label>Nama Lengkap *</label><input id="guruNama" placeholder="Nama lengkap..." /></div>
         <div class="form-field"><label>Username *</label><input id="guruUsername" placeholder="username unik..." /></div>
       </div>
-      <div class="form-row">
-        <div class="form-field"><label>Password *</label><input type="password" id="guruPassword" placeholder="min 6 karakter..." /></div>
-        <div class="form-field"><label>NIP</label><input id="guruNip" placeholder="NIP (opsional)" /></div>
-      </div>
       <div class="form-field" style="margin-bottom:14px">
-        <label>Mata Pelajaran yang Diampu *</label>
-        <input id="guruMapel" placeholder="contoh: Matematika, Fisika (pisah koma)" />
+        <label>Password *</label>
+        <input type="password" id="guruPassword" placeholder="min 6 karakter..." />
       </div>
-      <div class="form-field">
-        <label>Kelas yang Diajar *</label>
-        <input id="guruKelas" placeholder="contoh: X-A, X-B, XI-A (pisah koma)" />
+      <!-- Field khusus guru (disembunyikan jika role bukan guru) -->
+      <div id="guruFieldsGuru">
+        <div class="form-row">
+          <div class="form-field"><label>NIP</label><input id="guruNip" placeholder="NIP (opsional)" /></div>
+          <div class="form-field"><label>Status</label>
+            <select id="guruStatus"><option value="Aktif">Aktif</option><option value="Tidak Aktif">Tidak Aktif</option></select>
+          </div>
+        </div>
+        <div class="form-field" style="margin-bottom:14px">
+          <label>Mata Pelajaran yang Diampu</label>
+          <input id="guruMapel" placeholder="contoh: Matematika, Fisika (pisah koma)" />
+        </div>
+        <div class="form-field">
+          <label>Kelas yang Diajar</label>
+          <input id="guruKelas" placeholder="contoh: 7A, 8B, 10A (pisah koma)" />
+        </div>
       </div>
-      <div class="form-row" style="margin-top:14px">
+      <!-- Status untuk non-guru (selalu tampil) -->
+      <div id="guruFieldsStatus" style="display:none;margin-top:14px">
         <div class="form-field"><label>Status</label>
-          <select id="guruStatus"><option value="Aktif">Aktif</option><option value="Tidak Aktif">Tidak Aktif</option></select></div>
-        <div class="form-field"><label>Role</label>
-          <select id="guruRole"><option value="guru">Guru</option><option value="admin">Admin</option></select></div>
+          <select id="guruStatusAlt"><option value="Aktif">Aktif</option><option value="Tidak Aktif">Tidak Aktif</option></select>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modalGuru')">Batal</button>
-      <button class="btn btn-primary" onclick="Admin.guru.save()">Simpan Guru</button>
+      <button class="btn btn-primary" id="guruSaveBtn" onclick="Admin.guru.save()">Simpan Guru</button>
     </div>
   </div>
 </div>

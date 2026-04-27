@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SiNilai — Kurikulum</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <script src="js/core/guard.js"></script>
+  <style>
+    /* ── KURIKULUM SPLIT LAYOUT ── */
+    .kuri-layout {
+      display: flex; height: calc(100vh - 0px); overflow: hidden;
+      margin-left: var(--sidebar-w);
+    }
+    .kuri-list {
+      width: 280px; flex-shrink: 0;
+      background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+      position: fixed; top: 0; left: var(--sidebar-w); z-index: 40;
+    }
+    .kuri-list-top {
+      padding: 14px 14px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .kuri-list-title {
+      font-size: 11px; font-weight: 700; color: var(--text3);
+      letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .kuri-search {
+      position: relative;
+    }
+    .kuri-search svg {
+      position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
+      width: 13px; height: 13px; color: var(--text3);
+    }
+    .kuri-search input {
+      width: 100%; padding: 7px 9px 7px 28px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-family: inherit; font-size: 12px; outline: none;
+    }
+    .kuri-search input:focus { border-color: var(--primary); }
+    .kuri-search input::placeholder { color: var(--text3); }
+    .guru-items { flex: 1; overflow-y: auto; padding: 6px; }
+    .guru-items::-webkit-scrollbar { width: 3px; }
+    .guru-items::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+    .guru-entry {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: var(--radius-sm);
+      cursor: pointer; transition: all 0.15s; margin-bottom: 1px;
+      border: 1px solid transparent;
+    }
+    .guru-entry:hover { background: var(--surface2); }
+    .guru-entry.active { background: var(--primary-light); border-color: rgba(59,130,246,0.2); }
+    .ge-av {
+      width: 34px; height: 34px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
+    }
+    .ge-name { font-size: 12px; font-weight: 600; color: var(--text); }
+    .ge-sub { font-size: 10px; color: var(--text2); margin-top: 1px; }
+    .ge-dot { width: 7px; height: 7px; border-radius: 50%; margin-left: auto; flex-shrink: 0; }
+    .ge-dot.ok { background: var(--success); }
+    .ge-dot.empty { background: var(--error); }
+
+    /* ── DETAIL PANE ── */
+    .kuri-detail {
+      flex: 1; margin-left: 280px; display: flex; flex-direction: column;
+      height: 100vh; overflow: hidden;
+    }
+    .kd-topbar {
+      padding: 13px 22px; border-bottom: 1px solid var(--border);
+      background: var(--surface); display: flex; align-items: center;
+      justify-content: space-between; flex-shrink: 0;
+    }
+    .kd-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .kd-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+    .kd-scroll { flex: 1; overflow-y: auto; padding: 20px 22px; }
+    .kd-scroll::-webkit-scrollbar { width: 4px; }
+    .kd-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+    /* STATS PILLS */
+    .stats-pills { display: flex; gap: 10px; margin-bottom: 16px; }
+    .stat-pill {
+      padding: 10px 16px; border-radius: var(--radius-sm);
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sp-val { font-size: 20px; font-weight: 800; color: var(--text); }
+    .sp-lbl { font-size: 10px; color: var(--text2); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* STEP CARDS */
+    .step-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 14px; overflow: hidden;
+    }
+    .step-head {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface2);
+    }
+    .step-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; flex-shrink: 0;
+    }
+    .step-num.s1 { background: var(--primary-light); color: var(--primary); }
+    .step-num.s2 { background: var(--accent-light); color: var(--accent); }
+    .step-title { font-size: 13px; font-weight: 700; color: var(--text); }
+    .step-hint { font-size: 11px; color: var(--text2); margin-left: auto; }
+    .step-body { padding: 14px 16px; }
+
+    /* MAPEL CHIPS STEP 1 */
+    .mapel-chip-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+    .mc {
+      padding: 7px 13px; border-radius: var(--radius-sm);
+      font-size: 12px; font-weight: 600;
+      border: 1.5px solid var(--border2); color: var(--text2);
+      cursor: pointer; transition: all 0.15s; font-family: inherit;
+      background: transparent;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mc:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+    .mc.on { border-color: var(--primary); background: var(--primary); color: white; }
+    .mc .mc-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.7; flex-shrink: 0; }
+
+    /* ACCORDION STEP 2 */
+    .acc-list { display: flex; flex-direction: column; gap: 6px; }
+    .acc-item {
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      overflow: hidden; transition: border-color 0.15s;
+    }
+    .acc-item.open { border-color: var(--primary); }
+    .acc-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; cursor: pointer; background: var(--surface2);
+      transition: background 0.15s; user-select: none;
+    }
+    .acc-head:hover { background: var(--surface); }
+    .acc-item.open .acc-head { background: var(--primary-light); }
+    .acc-mdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .acc-mapel { font-size: 12px; font-weight: 700; color: var(--text); flex: 1; }
+    .acc-item.open .acc-mapel { color: var(--primary); }
+    .acc-kcount {
+      font-size: 10px; font-weight: 600; padding: 2px 7px;
+      border-radius: 4px; background: rgba(255,255,255,0.06); color: var(--text2);
+    }
+    .acc-item.open .acc-kcount { background: var(--primary-light); color: var(--primary); }
+    .acc-arrow { font-size: 10px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
+    .acc-item.open .acc-arrow { transform: rotate(180deg); color: var(--primary); }
+    .acc-del {
+      width: 22px; height: 22px; border-radius: 4px; background: transparent;
+      border: none; color: var(--text3); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; transition: all 0.15s;
+    }
+    .acc-del:hover { background: var(--error-bg); color: var(--error); }
+    .acc-body {
+      display: none; padding: 12px 14px;
+      border-top: 1px solid var(--border); background: var(--bg);
+      animation: fadeIn 0.2s ease;
+    }
+    .acc-item.open .acc-body { display: block; }
+    .tingkat-sec { margin-bottom: 10px; }
+    .tingkat-sec:last-child { margin-bottom: 0; }
+    .tingkat-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    .tingkat-lbl { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+    .tingkat-selall {
+      font-size: 10px; font-weight: 600; color: var(--primary);
+      cursor: pointer; border: none; background: none; font-family: inherit;
+      transition: opacity 0.15s;
+    }
+    .tingkat-selall:hover { opacity: 0.7; }
+    .kelas-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .kchip {
+      padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;
+      border: 1px solid var(--border2); color: var(--text2); background: var(--surface);
+      cursor: pointer; transition: all 0.12s; font-family: inherit;
+    }
+    .kchip:hover { border-color: var(--primary); color: var(--primary); }
+    .kchip.on { background: var(--primary); border-color: var(--primary); color: white; }
+    .empty-acc {
+      text-align: center; padding: 24px; font-size: 12px;
+      color: var(--text3); font-style: italic;
+    }
+
+    /* SAVE BAR */
+    .save-bar {
+      padding: 12px 22px; background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; max-height: 0; overflow: hidden; opacity: 0;
+      transition: max-height 0.3s, opacity 0.3s, padding 0.3s;
+    }
+    .save-bar.show { max-height: 56px; opacity: 1; }
+    .sb-txt { font-size: 12px; color: var(--text2); }
+    .sb-txt strong { color: var(--accent); }
+
+    /* ── HALAMAN KELOLA MAPEL ── */
+    .mapel-manage-page {
+      padding: 22px; display: none; height: 100%;
+      overflow-y: auto;
+    }
+    .mapel-manage-page.active { display: block; }
+    .mapel-add-row {
+      display: flex; gap: 8px; margin-bottom: 18px; align-items: center;
+    }
+    .mapel-add-input {
+      flex: 1; padding: 9px 12px; background: var(--surface2);
+      border: 1.5px solid var(--border2); border-radius: var(--radius-sm);
+      color: var(--text); font-family: inherit; font-size: 13px; outline: none;
+      max-width: 320px;
+    }
+    .mapel-add-input:focus { border-color: var(--primary); }
+    .mapel-add-input::placeholder { color: var(--text3); }
+    .mapel-table-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+    .mapel-row-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 16px; border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    .mapel-row-item:last-child { border-bottom: none; }
+    .mapel-row-item:hover { background: var(--surface2); }
+    .mr-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .mr-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+    .mr-usage { font-size: 11px; color: var(--text2); padding: 2px 8px; background: var(--surface2); border-radius: 4px; }
+    .mr-edit-input {
+      flex: 1; padding: 5px 9px; background: var(--bg);
+      border: 1.5px solid var(--primary); border-radius: var(--radius-sm);
+      color: var(--text); font-family: inherit; font-size: 13px; outline: none;
+      display: none;
+    }
+    .mr-edit-input.show { display: block; }
+    .mr-actions { display: flex; gap: 6px; }
+
+    /* KONFIRMASI DAMPAK MODAL */
+    .dampak-list { margin: 14px 0; max-height: 200px; overflow-y: auto; }
+    .dampak-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-radius: var(--radius-sm);
+      background: var(--surface2); margin-bottom: 6px;
+    }
+    .dampak-item:last-child { margin-bottom: 0; }
+    .dampak-av {
+      width: 28px; height: 28px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: white; flex-shrink: 0;
+      background: var(--primary);
+    }
+    .dampak-name { font-size: 12px; font-weight: 600; color: var(--text); }
+    .dampak-desc { font-size: 11px; color: var(--text2); margin-top: 1px; }
+    .dampak-warning {
+      padding: 10px 14px; border-radius: var(--radius-sm);
+      background: var(--accent-light); border: 1px solid rgba(245,158,11,0.3);
+      font-size: 12px; color: var(--accent); margin-bottom: 12px;
+    }
+
+    /* MAPEL COLOR DOTS */
+    .dot-blue { background: #3b82f6; }
+    .dot-green { background: #10b981; }
+    .dot-amber { background: #f59e0b; }
+    .dot-purple { background: #a78bfa; }
+    .dot-rose { background: #f43f5e; }
+    .dot-cyan { background: #06b6d4; }
+    .dot-orange { background: #f97316; }
+    .dot-teal { background: #14b8a6; }
+    .dot-indigo { background: #6366f1; }
+    .dot-lime { background: #84cc16; }
+
+    @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">Si<span>Nilai</span> <span class="admin-badge">KURIKULUM</span></div>
+    <div class="login-role">Portal Staf Kurikulum</div>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="username kurikulum" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="field-password-wrap">
+        <input type="password" id="loginPass" placeholder="••••••••" />
+        <button type="button" class="btn-show-pass" onclick="togglePassword('loginPass',this)" tabindex="-1">
+          <svg class="eye-icon" viewBox="0 0 20 20" fill="none">
+            <path class="eye-open" d="M10 4C5.5 4 2 10 2 10s3.5 6 8 6 8-6 8-6-3.5-6-8-6zm0 10a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <button class="btn-login" onclick="Kurikulum.login()">Masuk</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="appScreen" style="display:none">
+  <div class="sidebar-brand">Si<span>Nilai</span><small>Kurikulum</small></div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Menu</div>
+    <button class="nav-item active" id="navPenugasan" onclick="Kurikulum.showPage('penugasan',this)">
+      <span class="icon">📋</span> Penugasan Guru
+    </button>
+    <button class="nav-item" id="navMapel" onclick="Kurikulum.showPage('mapel',this)">
+      <span class="icon">📚</span> Kelola Mata Pelajaran
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-chip">
+      <div class="admin-avatar" style="background:var(--primary);color:white">K</div>
+      <div class="admin-info">
+        <small>Kurikulum</small>
+        <span id="kuriName">—</span>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="Kurikulum.logout()">Keluar</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="mainArea" style="display:none; margin-left:0; padding:0;">
+  <div class="kuri-layout">
+
+    <!-- GURU LIST (hanya tampil di halaman penugasan) -->
+    <div class="kuri-list" id="kuriListPanel">
+      <div class="kuri-list-top">
+        <div class="kuri-list-title">Daftar Guru <span id="guruCountBadge" style="font-weight:400;color:var(--text2)"></span></div>
+        <div class="kuri-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="guruSearchInput" placeholder="Cari nama guru..." oninput="Kurikulum.filterGuru(this.value)">
+        </div>
+      </div>
+      <div class="guru-items" id="guruItems">
+        <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">⏳ Memuat...</div>
+      </div>
+    </div>
+
+    <!-- DETAIL / KONTEN UTAMA -->
+    <div class="kuri-detail" id="kuriDetail">
+
+      <!-- TOP BAR PENUGASAN -->
+      <div class="kd-topbar" id="kdTopbarPenugasan">
+        <div>
+          <div class="kd-title" id="kdTitle">Pilih guru di kiri</div>
+          <div class="kd-sub" id="kdSub">untuk mulai mengatur penugasan</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="stats-pills" id="detailStats" style="margin:0;display:none">
+            <div class="stat-pill">
+              <div><div class="sp-val" id="spMapel">0</div><div class="sp-lbl">Mapel</div></div>
+            </div>
+            <div class="stat-pill">
+              <div><div class="sp-val" id="spKelas">0</div><div class="sp-lbl">Kelas</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP BAR KELOLA MAPEL -->
+      <div class="kd-topbar" id="kdTopbarMapel" style="display:none">
+        <div>
+          <div class="kd-title">📚 Kelola Mata Pelajaran</div>
+          <div class="kd-sub">Tambah, edit, atau hapus daftar mata pelajaran</div>
+        </div>
+      </div>
+
+      <!-- KONTEN PENUGASAN -->
+      <div class="kd-scroll" id="pagePenugasan">
+        <!-- Empty state -->
+        <div id="emptyState" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60%;color:var(--text3);gap:12px">
+          <div style="font-size:48px">👈</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text2)">Pilih guru dari daftar</div>
+          <div style="font-size:12px">untuk mengatur penugasan mata pelajaran & kelas</div>
+        </div>
+
+        <!-- Detail guru (tersembunyi saat tidak ada pilihan) -->
+        <div id="guruDetail" style="display:none">
+
+          <!-- STEP 1 -->
+          <div class="step-card">
+            <div class="step-head">
+              <div class="step-num s1">1</div>
+              <div class="step-title">Pilih Mata Pelajaran</div>
+              <div class="step-hint">Centang mapel yang diajar guru ini</div>
+            </div>
+            <div class="step-body">
+              <div class="mapel-chip-grid" id="mapelChipGrid">
+                <div style="color:var(--text3);font-size:12px">Memuat mapel...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div class="step-card">
+            <div class="step-head">
+              <div class="step-num s2">2</div>
+              <div class="step-title">Atur Kelas per Mata Pelajaran</div>
+              <div class="step-hint">Buka tiap mapel untuk pilih kelas</div>
+            </div>
+            <div class="step-body" id="step2Body">
+              <div class="empty-acc">Pilih mata pelajaran di Langkah 1 terlebih dahulu</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- KONTEN KELOLA MAPEL -->
+      <div class="mapel-manage-page" id="pageMapel">
+        <div class="page-header" style="margin-bottom:18px">
+          <h2 style="font-size:18px">📚 Mata Pelajaran</h2>
+          <p style="font-size:12px">Perubahan nama akan memperbarui penugasan semua guru secara otomatis</p>
+        </div>
+        <div class="mapel-add-row">
+          <input class="mapel-add-input" id="newMapelInput" placeholder="Nama mata pelajaran baru..." />
+          <button class="btn btn-primary" onclick="Kurikulum.mapel.tambah()">+ Tambah</button>
+        </div>
+        <div class="mapel-table-wrap" id="mapelTableWrap">
+          <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">⏳ Memuat...</div>
+        </div>
+      </div>
+
+      <!-- SAVE BAR -->
+      <div class="save-bar" id="savePenugasanBar">
+        <div class="sb-txt">Ada <strong>perubahan belum disimpan</strong></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="Kurikulum.penugasan.cancel()">Batalkan</button>
+          <button class="btn btn-primary btn-sm" onclick="Kurikulum.penugasan.save()">💾 Simpan Penugasan</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL KONFIRMASI DAMPAK -->
+<div class="modal-overlay" id="modalDampak">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title" id="dampakTitle">⚠️ Konfirmasi Perubahan</span>
+      <button class="modal-close" onclick="closeModal('modalDampak')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="dampak-warning" id="dampakWarning"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">Guru yang Terdampak:</div>
+      <div class="dampak-list" id="dampakList"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalDampak')">Batal</button>
+      <button class="btn btn-primary" id="dampakConfirmBtn">Ya, Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING + TOAST -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Memuat data...</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- SCRIPTS -->
+<script src="js/core/config.js"></script>
+<script src="js/core/ui.js"></script>
+<script src="js/core/http.js"></script>
+<script src="js/services/api.js"></script>
+<script src="js/services/session.js"></script>
+<script src="js/utils/constants.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  DATA & STATE
+// ═══════════════════════════════════════════════════════
+const TINGKAT = {
+  'Kelas 7' : ['7A','7B','7C','7D','7E','7F','7G','7H'],
+  'Kelas 8' : ['8A','8B','8C','8D','8E','8F','8G','8H'],
+  'Kelas 9' : ['9A','9B','9C','9D','9E','9F','9G','9H'],
+  'Kelas 10': ['10A','10B','10C','10D','10E','10F'],
+  'Kelas 11': ['11A','11B','11C','11D','11E','11F'],
+  'Kelas 12': ['12A','12B','12C','12D','12E','12F'],
+};
+const DOT_COLORS = ['dot-blue','dot-green','dot-amber','dot-purple','dot-rose','dot-cyan','dot-orange','dot-teal','dot-indigo','dot-lime'];
+const AVATAR_COLORS = ['#3b82f6','#10b981','#f59e0b','#a78bfa','#f43f5e','#06b6d4','#f97316','#14b8a6','#6366f1','#84cc16'];
+
+let guruList   = [];
+let mapelList  = [];   // [{id, nama}]
+let currentGuru = null;
+let currentPen  = [];  // [{mapel, kelas:[]}]
+let penDirty    = false;
+let openAcc     = null;
+
+function dotColor(mapelNama) {
+  const i = mapelList.findIndex(m => m.nama === mapelNama);
+  return DOT_COLORS[i % DOT_COLORS.length] || 'dot-blue';
+}
+function avatarColor(i) { return AVATAR_COLORS[i % AVATAR_COLORS.length]; }
+function initials(nama) { return nama.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+function clonePen(guru) {
+  return (guru.penugasan || []).map(p => ({ mapel: p.mapel, kelas: [...(p.kelas||[])] }));
+}
+
+// ═══════════════════════════════════════════════════════
+//  KURIKULUM APP
+// ═══════════════════════════════════════════════════════
+const Kurikulum = {
+
+  // ── LOGIN ─────────────────────────────────────────────
+  async login() {
+    const username = UI.$('loginUser').value.trim();
+    const password = UI.$('loginPass').value;
+    if (!username || !password) { UI.$('loginErr').textContent = 'Username dan password wajib diisi'; UI.$('loginErr').style.display='block'; return; }
+    UI.showLoading('Masuk...');
+    try {
+      const res = await api.login(username, password);
+      if (res.status === 'ok' && res.role === 'kurikulum') {
+        sessionStorage.setItem('sinilai_kuri_session', JSON.stringify({ username, nama: res.nama || username }));
+        UI.hideLoading();
+        this._showApp(res.nama || username);
+      } else if (res.status === 'ok') {
+        UI.hideLoading();
+        UI.$('loginErr').textContent = 'Akun ini tidak memiliki akses kurikulum';
+        UI.$('loginErr').style.display = 'block';
+      } else {
+        UI.hideLoading();
+        UI.$('loginErr').textContent = res.message || 'Login gagal';
+        UI.$('loginErr').style.display = 'block';
+      }
+    } catch {
+      UI.hideLoading();
+      UI.$('loginErr').textContent = 'Gagal terhubung ke server';
+      UI.$('loginErr').style.display = 'block';
+    }
+  },
+
+  logout() {
+    if (!confirm('Keluar dari dashboard kurikulum?')) return;
+    sessionStorage.removeItem('sinilai_kuri_session');
+    location.reload();
+  },
+
+  _showApp(nama) {
+    UI.$('loginScreen').style.display = 'none';
+    UI.$('appScreen').style.display   = '';
+    UI.$('mainArea').style.display    = '';
+    UI.$('mainArea').style.marginLeft = 'var(--sidebar-w)';
+    UI.$('kuriName').textContent = nama;
+    document.body.classList.add('app-ready');
+    this.loadAll();
+  },
+
+  async loadAll() {
+    UI.showLoading('Memuat data...');
+    try {
+      const [resGuru, resMapel] = await Promise.all([
+        api.getGuru(),
+        api.getMapel(),
+      ]);
+      if (resGuru.status === 'ok')  guruList  = (resGuru.guru  || []).filter(g => g.role === 'guru' || !g.role);
+      if (resMapel.status === 'ok') mapelList = resMapel.mapel || [];
+      this.renderGuruList();
+    } catch {
+      UI.showToast('Gagal memuat data', 'error');
+    } finally {
+      UI.hideLoading();
+    }
+  },
+
+  showPage(page, btn) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (page === 'penugasan') {
+      UI.$('kuriListPanel').style.display = '';
+      UI.$('kuriDetail').style.marginLeft = '280px';
+      UI.$('kdTopbarPenugasan').style.display = '';
+      UI.$('kdTopbarMapel').style.display = 'none';
+      UI.$('pagePenugasan').style.display = '';
+      UI.$('pageMapel').classList.remove('active');
+      UI.$('savePenugasanBar').style.display = '';
+    } else {
+      UI.$('kuriListPanel').style.display = 'none';
+      UI.$('kuriDetail').style.marginLeft = '0';
+      UI.$('kdTopbarPenugasan').style.display = 'none';
+      UI.$('kdTopbarMapel').style.display = '';
+      UI.$('pagePenugasan').style.display = 'none';
+      UI.$('pageMapel').classList.add('active');
+      UI.$('savePenugasanBar').style.display = 'none';
+      this.mapel.render();
+    }
+  },
+
+  // ── GURU LIST ─────────────────────────────────────────
+  renderGuruList(list = guruList) {
+    UI.$('guruCountBadge').textContent = `(${list.length})`;
+    UI.$('guruItems').innerHTML = list.length
+      ? list.map((g,i) => {
+          const totalKelas = new Set((g.penugasan||[]).flatMap(p=>p.kelas||[])).size;
+          const hasAny = (g.penugasan||[]).length > 0;
+          return `
+            <div class="guru-entry ${currentGuru?.username===g.username?'active':''}"
+              onclick="Kurikulum.selectGuru('${g.username}')">
+              <div class="ge-av" style="background:${avatarColor(i)}">${initials(g.nama)}</div>
+              <div>
+                <div class="ge-name">${g.nama}</div>
+                <div class="ge-sub">${hasAny ? `${(g.penugasan||[]).length} mapel · ${totalKelas} kelas` : 'Belum ditugaskan'}</div>
+              </div>
+              <div class="ge-dot ${hasAny?'ok':'empty'}"></div>
+            </div>`;
+        }).join('')
+      : '<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Tidak ada guru ditemukan</div>';
+  },
+
+  filterGuru(q) {
+    const filtered = guruList.filter(g => g.nama.toLowerCase().includes(q.toLowerCase()) || (g.nip||'').includes(q));
+    this.renderGuruList(filtered);
+  },
+
+  selectGuru(username) {
+    if (penDirty && !confirm('Ada perubahan belum disimpan. Tinggalkan?')) return;
+    currentGuru = guruList.find(g => g.username === username);
+    if (!currentGuru) return;
+    currentPen = clonePen(currentGuru);
+    penDirty = false;
+    openAcc = null;
+    UI.$('savePenugasanBar').classList.remove('show');
+    this.renderGuruList();
+    this.penugasan.render();
+  },
+
+  // ── PENUGASAN ─────────────────────────────────────────
+  penugasan: {
+    render() {
+      if (!currentGuru) return;
+      UI.$('emptyState').style.display = 'none';
+      UI.$('guruDetail').style.display = '';
+      UI.$('kdTitle').textContent = currentGuru.nama;
+      UI.$('kdSub').textContent   = 'NIP: ' + (currentGuru.nip || '—');
+      UI.$('detailStats').style.display = 'flex';
+      this.updateStats();
+      this.renderStep1();
+      this.renderStep2();
+    },
+
+    updateStats() {
+      UI.$('spMapel').textContent = currentPen.length;
+      UI.$('spKelas').textContent = new Set(currentPen.flatMap(p=>p.kelas)).size;
+    },
+
+    renderStep1() {
+      UI.$('mapelChipGrid').innerHTML = mapelList.length
+        ? mapelList.map(m => {
+            const on = currentPen.some(p => p.mapel === m.nama);
+            return `<button class="mc ${on?'on':''}" onclick="Kurikulum.penugasan.toggleMapel('${m.nama}')">
+              <span class="mc-dot"></span>${m.nama}
+            </button>`;
+          }).join('')
+        : '<div style="color:var(--text3);font-size:12px">Belum ada mata pelajaran. Tambahkan di menu Kelola Mata Pelajaran.</div>';
+    },
+
+    renderStep2() {
+      if (!currentPen.length) {
+        UI.$('step2Body').innerHTML = '<div class="empty-acc">Pilih mata pelajaran di Langkah 1 terlebih dahulu</div>';
+        return;
+      }
+      UI.$('step2Body').innerHTML = `<div class="acc-list">${currentPen.map((row,ri) => {
+        const dc = DOT_COLORS[mapelList.findIndex(m=>m.nama===row.mapel) % DOT_COLORS.length] || 'dot-blue';
+        return `
+          <div class="acc-item ${openAcc===row.mapel?'open':''}" id="acc-${ri}">
+            <div class="acc-head" onclick="Kurikulum.penugasan.toggleAcc('${row.mapel}')">
+              <div class="acc-mdot ${dc}"></div>
+              <div class="acc-mapel">${row.mapel}</div>
+              <span class="acc-kcount">${row.kelas.length} kelas</span>
+              <span class="acc-arrow">▼</span>
+              <button class="acc-del" onclick="event.stopPropagation();Kurikulum.penugasan.removeMapel(${ri})">✕</button>
+            </div>
+            <div class="acc-body">
+              ${Object.entries(TINGKAT).map(([t,klist]) => `
+                <div class="tingkat-sec">
+                  <div class="tingkat-row">
+                    <span class="tingkat-lbl">${t}</span>
+                    <button class="tingkat-selall" onclick="Kurikulum.penugasan.selAllTingkat(${ri},'${t}',${JSON.stringify(klist)})">Pilih semua</button>
+                  </div>
+                  <div class="kelas-chips">
+                    ${klist.map(k=>`<button class="kchip ${row.kelas.includes(k)?'on':''}"
+                      onclick="Kurikulum.penugasan.toggleK(${ri},'${k}',this)">${k}</button>`).join('')}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>`;
+      }).join('')}</div>`;
+    },
+
+    toggleMapel(nama) {
+      const i = currentPen.findIndex(p => p.mapel === nama);
+      if (i >= 0) { currentPen.splice(i,1); if(openAcc===nama) openAcc=null; }
+      else { currentPen.push({ mapel: nama, kelas: [] }); openAcc = nama; }
+      this.markDirty(); this.render();
+    },
+
+    toggleAcc(mapel) {
+      openAcc = openAcc === mapel ? null : mapel;
+      this.renderStep2();
+    },
+
+    toggleK(ri, k, btn) {
+      const row = currentPen[ri];
+      const i = row.kelas.indexOf(k);
+      if (i >= 0) row.kelas.splice(i,1); else row.kelas.push(k);
+      btn.classList.toggle('on');
+      this.markDirty(); this.updateStats();
+      document.querySelector(`#acc-${ri} .acc-kcount`).textContent = row.kelas.length + ' kelas';
+    },
+
+    selAllTingkat(ri, tingkat, klist) {
+      const row = currentPen[ri];
+      const allOn = klist.every(k => row.kelas.includes(k));
+      if (allOn) row.kelas = row.kelas.filter(k => !klist.includes(k));
+      else klist.forEach(k => { if (!row.kelas.includes(k)) row.kelas.push(k); });
+      this.markDirty(); this.renderStep2(); this.updateStats();
+    },
+
+    removeMapel(ri) {
+      currentPen.splice(ri, 1);
+      this.markDirty(); this.render();
+    },
+
+    markDirty() {
+      penDirty = true;
+      UI.$('savePenugasanBar').classList.add('show');
+    },
+
+    cancel() {
+      currentPen = clonePen(currentGuru);
+      penDirty = false; openAcc = null;
+      UI.$('savePenugasanBar').classList.remove('show');
+      this.render();
+    },
+
+    async save() {
+      if (!currentGuru) return;
+      UI.showLoading('Menyimpan penugasan...');
+      try {
+        const res = await api.savePenugasan({
+          username: currentGuru.username,
+          penugasan: currentPen,
+        });
+        if (res.status === 'ok') {
+          // Update local data
+          currentGuru.penugasan = currentPen.map(p => ({ mapel: p.mapel, kelas: [...p.kelas] }));
+          const idx = guruList.findIndex(g => g.username === currentGuru.username);
+          if (idx >= 0) guruList[idx] = { ...currentGuru };
+          penDirty = false;
+          UI.$('savePenugasanBar').classList.remove('show');
+          Kurikulum.renderGuruList();
+          UI.showToast('✓ Penugasan berhasil disimpan', 'success');
+        } else {
+          UI.showToast('Gagal: ' + (res.message || 'Error'), 'error');
+        }
+      } catch {
+        UI.showToast('Gagal terhubung ke server. Periksa koneksi internet.', 'error');
+      } finally {
+        UI.hideLoading();
+      }
+    },
+  },
+
+  // ── KELOLA MAPEL ──────────────────────────────────────
+  mapel: {
+    render() {
+      UI.$('mapelTableWrap').innerHTML = mapelList.length
+        ? mapelList.map((m, i) => {
+            const usage = guruList.filter(g => (g.penugasan||[]).some(p => p.mapel === m.nama)).length;
+            return `
+              <div class="mapel-row-item" id="mr-${i}">
+                <div class="mr-dot ${DOT_COLORS[i % DOT_COLORS.length]}"></div>
+                <div class="mr-name" id="mrName-${i}">${m.nama}</div>
+                <input class="mr-edit-input" id="mrInput-${i}" value="${m.nama}" />
+                <span class="mr-usage">${usage} guru</span>
+                <div class="mr-actions">
+                  <button class="btn btn-ghost btn-sm" id="mrEditBtn-${i}" onclick="Kurikulum.mapel.startEdit(${i})">Edit</button>
+                  <button class="btn btn-primary btn-sm" id="mrSaveBtn-${i}" style="display:none" onclick="Kurikulum.mapel.confirmEdit(${i})">Simpan</button>
+                  <button class="btn btn-ghost btn-sm" id="mrCancelBtn-${i}" style="display:none" onclick="Kurikulum.mapel.cancelEdit(${i})">Batal</button>
+                  <button class="btn btn-danger btn-sm" onclick="Kurikulum.mapel.confirmHapus(${i})">Hapus</button>
+                </div>
+              </div>`;
+          }).join('')
+        : '<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Belum ada mata pelajaran</div>';
+    },
+
+    startEdit(i) {
+      UI.$('mrName-' + i).style.display = 'none';
+      UI.$('mrInput-' + i).classList.add('show');
+      UI.$('mrEditBtn-' + i).style.display = 'none';
+      UI.$('mrSaveBtn-' + i).style.display = '';
+      UI.$('mrCancelBtn-' + i).style.display = '';
+      UI.$('mrInput-' + i).focus();
+    },
+
+    cancelEdit(i) {
+      UI.$('mrInput-' + i).value = mapelList[i].nama;
+      UI.$('mrName-' + i).style.display = '';
+      UI.$('mrInput-' + i).classList.remove('show');
+      UI.$('mrEditBtn-' + i).style.display = '';
+      UI.$('mrSaveBtn-' + i).style.display = 'none';
+      UI.$('mrCancelBtn-' + i).style.display = 'none';
+    },
+
+    confirmEdit(i) {
+      const namaLama = mapelList[i].nama;
+      const namaBaru = UI.$('mrInput-' + i).value.trim();
+      if (!namaBaru) { UI.showToast('Nama mapel tidak boleh kosong', 'error'); return; }
+      if (namaBaru === namaLama) { this.cancelEdit(i); return; }
+      if (mapelList.some((m,j) => j!==i && m.nama.toLowerCase()===namaBaru.toLowerCase())) {
+        UI.showToast('Nama mapel sudah ada', 'error'); return;
+      }
+
+      const terdampak = guruList.filter(g => (g.penugasan||[]).some(p => p.mapel === namaLama));
+
+      if (terdampak.length) {
+        this._showDampakModal(
+          `Nama mapel "${namaLama}" akan diubah menjadi "${namaBaru}"`,
+          `Penugasan ${terdampak.length} guru berikut akan diperbarui otomatis:`,
+          terdampak,
+          g => `Mapel "${namaLama}" → "${namaBaru}"`,
+          () => this._doEdit(i, namaLama, namaBaru)
+        );
+      } else {
+        this._doEdit(i, namaLama, namaBaru);
+      }
+    },
+
+    async _doEdit(i, namaLama, namaBaru) {
+      UI.showLoading('Memperbarui mata pelajaran...');
+      try {
+        const res = await api.editMapel({ namaLama, namaBaru });
+        if (res.status === 'ok') {
+          mapelList[i].nama = namaBaru;
+          // Update semua penugasan guru di local data
+          guruList.forEach(g => {
+            (g.penugasan||[]).forEach(p => {
+              if (p.mapel === namaLama) p.mapel = namaBaru;
+            });
+          });
+          // Jika sedang edit guru yang terdampak, perbarui currentPen juga
+          if (currentGuru) {
+            currentPen.forEach(p => { if (p.mapel === namaLama) p.mapel = namaBaru; });
+            Kurikulum.penugasan.render();
+          }
+          this.render();
+          Kurikulum.renderGuruList();
+          UI.showToast(`✓ Mapel berhasil diubah menjadi "${namaBaru}"`, 'success');
+        } else {
+          UI.showToast('Gagal: ' + (res.message || 'Error'), 'error');
+        }
+      } catch {
+        UI.showToast('Gagal terhubung ke server', 'error');
+      } finally {
+        UI.hideLoading();
+      }
+    },
+
+    confirmHapus(i) {
+      const nama = mapelList[i].nama;
+      const terdampak = guruList.filter(g => (g.penugasan||[]).some(p => p.mapel === nama));
+
+      if (terdampak.length) {
+        this._showDampakModal(
+          `Hapus mata pelajaran "${nama}"?`,
+          `⚠️ Penugasan "${nama}" akan dihapus dari ${terdampak.length} guru berikut:`,
+          terdampak,
+          g => `Mapel "${nama}" akan dihapus dari penugasan`,
+          () => this._doHapus(i, nama)
+        );
+      } else {
+        if (!confirm(`Hapus mata pelajaran "${nama}"?`)) return;
+        this._doHapus(i, nama);
+      }
+    },
+
+    async _doHapus(i, nama) {
+      UI.showLoading('Menghapus mata pelajaran...');
+      try {
+        const res = await api.deleteMapel({ nama });
+        if (res.status === 'ok') {
+          mapelList.splice(i, 1);
+          // Reset penugasan guru yang pakai mapel ini
+          guruList.forEach(g => {
+            if (g.penugasan) g.penugasan = g.penugasan.filter(p => p.mapel !== nama);
+          });
+          if (currentGuru) {
+            currentPen = currentPen.filter(p => p.mapel !== nama);
+            Kurikulum.penugasan.render();
+          }
+          this.render();
+          Kurikulum.renderGuruList();
+          UI.showToast(`✓ Mapel "${nama}" berhasil dihapus`, 'success');
+        } else {
+          UI.showToast('Gagal: ' + (res.message || 'Error'), 'error');
+        }
+      } catch {
+        UI.showToast('Gagal terhubung ke server', 'error');
+      } finally {
+        UI.hideLoading();
+      }
+    },
+
+    async tambah() {
+      const nama = UI.$('newMapelInput').value.trim();
+      if (!nama) { UI.showToast('Nama mapel tidak boleh kosong', 'error'); return; }
+      if (mapelList.some(m => m.nama.toLowerCase() === nama.toLowerCase())) {
+        UI.showToast('Nama mapel sudah ada', 'error'); return;
+      }
+      UI.showLoading('Menambahkan mata pelajaran...');
+      try {
+        const res = await api.addMapel({ nama });
+        if (res.status === 'ok') {
+          mapelList.push({ id: res.id || Date.now(), nama });
+          UI.$('newMapelInput').value = '';
+          this.render();
+          UI.showToast(`✓ Mapel "${nama}" berhasil ditambahkan`, 'success');
+        } else {
+          UI.showToast('Gagal: ' + (res.message || 'Error'), 'error');
+        }
+      } catch {
+        UI.showToast('Gagal terhubung ke server', 'error');
+      } finally {
+        UI.hideLoading();
+      }
+    },
+
+    _showDampakModal(title, warning, terdampak, descFn, onConfirm) {
+      UI.$('dampakTitle').textContent = title;
+      UI.$('dampakWarning').textContent = warning;
+      UI.$('dampakList').innerHTML = terdampak.map((g,i) => `
+        <div class="dampak-item">
+          <div class="dampak-av" style="background:${avatarColor(i)}">${initials(g.nama)}</div>
+          <div>
+            <div class="dampak-name">${g.nama}</div>
+            <div class="dampak-desc">${descFn(g)}</div>
+          </div>
+        </div>`).join('');
+      openModal('modalDampak');
+      const btn = UI.$('dampakConfirmBtn');
+      btn.onclick = () => { closeModal('modalDampak'); onConfirm(); };
+    },
+  },
+};
+
+// ── HELPERS ───────────────────────────────────────────
+function openModal(id)  { UI.$(id)?.classList.add('show'); }
+function closeModal(id) { UI.$(id)?.classList.remove('show'); }
+function togglePassword(id, btn) {
+  const input = UI.$(id);
+  const isText = input.type === 'text';
+  input.type = isText ? 'password' : 'text';
+  btn.querySelector('.eye-open').style.display  = isText ? '' : 'none';
+}
+
+// ── INIT ──────────────────────────────────────────────
+(function init() {
+  const sess = sessionStorage.getItem('sinilai_kuri_session');
+  if (sess) {
+    try {
+      const { nama } = JSON.parse(sess);
+      Kurikulum._showApp(nama);
+    } catch { sessionStorage.removeItem('sinilai_kuri_session'); }
+  }
+  UI.bindEnterKey(['loginUser','loginPass'], () => Kurikulum.login());
+})();
+</script>
+</body>
+</html>

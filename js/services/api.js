@@ -60,6 +60,13 @@ class ApiService {
 
   deleteHistory(hari)      { return this._http.post({ action: 'deleteHistory' }, { hari }); }
 
+  // ── Kurikulum ─────────────────────────────────────────
+  getMapel()               { return this._http.get({ action: 'getMapel' }); }
+  addMapel(data)           { return this._http.post({ action: 'addMapel' }, data); }
+  editMapel(data)          { return this._http.post({ action: 'editMapel' }, data); }
+  deleteMapel(data)        { return this._http.post({ action: 'deleteMapel' }, data); }
+  savePenugasan(data)      { return this._http.post({ action: 'savePenugasan' }, data); }
+
   async _saveNilaiBatch({ data, ...meta }) {
     const total = Math.ceil(data.length / Config.BATCH_SIZE);
     let   saved = 0;
