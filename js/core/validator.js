@@ -38,13 +38,15 @@ class Validator {
     return null;
   }
 
-  /** Validasi form guru — kembalikan pesan error atau null */
-  static guruForm({ nama, username, password, mapel, kelas }) {
+  /** Validasi form guru/kurikulum — mapel & kelas hanya wajib jika role guru */
+  static guruForm({ nama, username, password, mapel, kelas, role }) {
     if (!nama)     return 'Nama lengkap wajib diisi';
     if (!username) return 'Username wajib diisi';
     if (!password) return 'Password wajib diisi';
-    if (!mapel)    return 'Mata pelajaran wajib diisi';
-    if (!kelas)    return 'Kelas wajib diisi';
+    if (role === 'guru' || !role) {
+      if (!mapel) return 'Mata pelajaran wajib diisi';
+      if (!kelas) return 'Kelas wajib diisi';
+    }
     return null;
   }
 
