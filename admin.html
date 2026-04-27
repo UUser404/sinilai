@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SiNilai — Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <script src="js/core/guard.js"></script>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">Si<span>Nilai</span> <span class="admin-badge">ADMIN</span></div>
+    <div class="login-role">Dashboard Pengelola Sistem Akademik</div>
+    <div class="field">
+      <label>Username Admin</label>
+      <input type="text" id="loginUser" placeholder="admin" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="field-password-wrap">
+        <input type="password" id="loginPass" placeholder="••••••••" />
+        <button type="button" class="btn-show-pass" onclick="togglePassword('loginPass', this)" tabindex="-1" aria-label="Tampilkan password">
+          <svg class="eye-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="eye-open" d="M10 4C5.5 4 2 10 2 10s3.5 6 8 6 8-6 8-6-3.5-6-8-6zm0 10a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z" fill="currentColor"/>
+            <path class="eye-closed" style="display:none" d="M3 3l14 14M10 4C5.5 4 2 10 2 10s1 1.5 2.5 3M17.5 7C19 8.5 18 10 18 10s-3.5 6-8 6a7.2 7.2 0 01-3-.65" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <button class="btn-login" onclick="Admin.login()">Masuk sebagai Admin</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- MOBILE TOPBAR -->
+<div class="mobile-topbar" id="mobileTopbar" style="display:none">
+  <button class="btn-hamburger" onclick="Admin.toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="mobile-topbar-brand">Si<span>Nilai</span></div>
+  <div style="width:40px"></div>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="Admin.closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="appScreen" style="display:none">
+  <div class="sidebar-brand">Si<span>Nilai</span><small>Admin Panel</small></div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Menu</div>
+    <button class="nav-item active" onclick="Admin.showPage('dashboard',this)"><span class="icon">📊</span> Dashboard</button>
+    <button class="nav-item" onclick="Admin.showPage('guru',this)"><span class="icon">👨‍🏫</span> Data Guru</button>
+    <button class="nav-item" onclick="Admin.showPage('siswa',this)"><span class="icon">👩‍🎓</span> Data Siswa</button>
+    <button class="nav-item" onclick="Admin.showPage('nilai',this)"><span class="icon">📝</span> Rekap Nilai</button>
+    <button class="nav-item" onclick="Admin.showPage('export',this)"><span class="icon">📤</span> Export Laporan</button>
+    <div class="nav-label">Sistem</div>
+    <button class="nav-item" onclick="Admin.showPage('history',this)"><span class="icon">🕐</span> Histori Perubahan</button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-chip">
+      <div class="admin-avatar">A</div>
+      <div class="admin-info">
+        <small>Administrator</small>
+        <span id="adminName">Admin</span>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="Admin.logout()">Keluar</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="mainArea" style="display:none">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div><h2>📊 Dashboard</h2><p>Ringkasan sistem — auto refresh setiap 30 detik</p></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="clockDisplay" style="font-size:13px;color:var(--text2);font-weight:600"></div>
+        <button class="btn btn-ghost btn-sm" onclick="Admin.dashboard.load()">↻ Refresh</button>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-body" style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="koneksiDot" style="width:10px;height:10px;border-radius:50%;background:var(--text3);flex-shrink:0"></div>
+          <span id="koneksiLabel" style="font-size:13px;font-weight:600;color:var(--text2)">Memeriksa koneksi...</span>
+        </div>
+        <span id="koneksiDetail" style="font-size:12px;color:var(--text3)">—</span>
+      </div>
+    </div>
+    <div class="stats-grid" style="margin-bottom:16px">
+      <div class="stat-card blue"><div class="stat-icon">👨‍🏫</div><div class="stat-value" id="stat-guru">—</div><div class="stat-label">Total Guru</div></div>
+      <div class="stat-card green"><div class="stat-icon">👩‍🎓</div><div class="stat-value" id="stat-siswa">—</div><div class="stat-label">Total Siswa</div></div>
+      <div class="stat-card amber"><div class="stat-icon">📝</div><div class="stat-value" id="stat-nilai">—</div><div class="stat-label">Record Nilai</div></div>
+      <div class="stat-card purple"><div class="stat-icon">🏫</div><div class="stat-value" id="stat-kelas">—</div><div class="stat-label">Kelas Aktif</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">🕐 Aktivitas Terakhir</span>
+        <span id="lastRefresh" style="font-size:11px;color:var(--text3)">—</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Waktu</th><th>Guru</th><th>Aksi</th><th>Siswa</th><th>Kelas</th><th>Detail</th></tr></thead>
+          <tbody id="recentActivity"><tr><td colspan="6" style="color:var(--text3);text-align:center;padding:24px">⏳ Memuat...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA GURU -->
+  <div class="page" id="page-guru">
+    <div class="page-header"><h2>👨‍🏫 Data Guru</h2><p>Kelola akun guru dan pengampu mata pelajaran</p></div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Daftar Guru</span>
+        <div style="display:flex;gap:8px">
+          <input class="search-input" placeholder="Cari guru..." oninput="filterTable('guruBody',this.value)" />
+          <button class="btn btn-primary" onclick="Admin.guru.openAdd()">+ Tambah Guru</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Nama Guru</th><th>Username</th><th>Mata Pelajaran</th><th>Kelas</th><th>Status</th><th>Aksi</th></tr></thead>
+          <tbody id="guruBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA SISWA -->
+  <div class="page" id="page-siswa">
+    <div class="page-header"><h2>👩‍🎓 Data Siswa</h2><p>Kelola daftar siswa per kelas</p></div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Daftar Siswa</span>
+        <div style="display:flex;gap:8px">
+          <select class="filter-select" id="filterKelas" onchange="Admin.siswa.filterByKelas()"><option value="">Semua Kelas</option></select>
+          <input class="search-input" placeholder="Cari siswa..." oninput="filterTable('siswaBody',this.value)" />
+          <button class="btn btn-primary" onclick="Admin.siswa.openAdd()">+ Tambah Siswa</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>NIS</th><th>Nama Siswa</th><th>Kelas</th><th>Aksi</th></tr></thead>
+          <tbody id="siswaBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- REKAP NILAI -->
+  <div class="page" id="page-nilai">
+    <div class="page-header"><h2>📝 Rekap Nilai</h2><p>Pantau seluruh nilai yang telah diinput guru</p></div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Filter Nilai</span>
+        <div class="filter-row">
+          <select class="filter-select" id="fNilaiTahun"><option value="">Semua Tahun</option><option>2024/2025</option><option>2025/2026</option></select>
+          <select class="filter-select" id="fNilaiSem"><option value="">Semua Semester</option><option>Ganjil</option><option>Genap</option></select>
+          <select class="filter-select" id="fNilaiKelas"><option value="">Semua Kelas</option></select>
+          <select class="filter-select" id="fNilaiMapel"><option value="">Semua Mapel</option></select>
+          <button class="btn btn-primary btn-sm" onclick="Admin.nilai.loadRekap()">Tampilkan</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>No</th><th>NIS</th><th>Nama</th><th>Kelas</th><th>Mapel</th><th>UH1</th><th>UH2</th><th>PTS</th><th>ASAS/ASAT</th><th>Nilai Proses</th><th>Nilai Raport</th></tr></thead>
+          <tbody id="nilaiRekapBody"><tr><td colspan="11" style="text-align:center;color:var(--text3);padding:40px">Pilih filter dan klik Tampilkan</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="page" id="page-export">
+    <div class="page-header"><h2>📤 Export Laporan</h2><p>Unduh data dalam format CSV</p></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="export-grid">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Export Nilai per Kelas</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+          <div class="form-field"><label>Tahun Ajaran</label>
+            <select class="filter-select" id="fExportTahun" style="width:100%"><option value="">Semua</option><option>2024/2025</option><option>2025/2026</option></select></div>
+          <div class="form-field"><label>Semester</label>
+            <select class="filter-select" id="fExportSem" style="width:100%"><option value="">Semua</option><option>Ganjil</option><option>Genap</option></select></div>
+          <div class="form-field"><label>Kelas</label>
+            <select class="filter-select" id="fExportKelas" style="width:100%"><option value="">Semua Kelas</option></select></div>
+          <div class="form-field"><label>Mata Pelajaran</label>
+            <select class="filter-select" id="fExportMapel" style="width:100%"><option value="">Semua Mapel</option></select></div>
+          <button class="btn btn-export" onclick="Admin.nilai.exportNilaiCSV()">📊 Export ke CSV</button>
+          <button class="btn btn-export" onclick="window.print()">🖨️ Cetak / PDF</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Export Rekap Guru</span></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+          <p style="font-size:13px;color:var(--text2)">Export semua data guru aktif ke CSV.</p>
+          <button class="btn btn-export" onclick="Admin.nilai.exportGuruCSV()">📊 Export Data Guru</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORI -->
+  <div class="page" id="page-history">
+    <div class="page-header"><h2>🕐 Histori Perubahan</h2><p>Log audit semua perubahan nilai</p></div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header" style="flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="card-title" style="margin:0">Tampilkan</span>
+          <div class="rentang-group">
+            <button class="btn-rentang active" onclick="Admin.history.setRentang(30,this)">30 Hari</button>
+            <button class="btn-rentang" onclick="Admin.history.setRentang(90,this)">90 Hari</button>
+            <button class="btn-rentang" onclick="Admin.history.setRentang(365,this)">1 Tahun</button>
+            <button class="btn-rentang" onclick="Admin.history.setRentang(0,this)">Semua</button>
+          </div>
+          <input class="search-input" placeholder="Cari log..." oninput="filterTable('historyBody',this.value)" />
+        </div>
+        <div class="hapus-history-row" style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;color:var(--text3)">Hapus history &gt;</span>
+          <button class="btn btn-danger btn-sm" onclick="Admin.history.confirmHapus(30)">30 Hari lalu</button>
+          <button class="btn btn-danger btn-sm" onclick="Admin.history.confirmHapus(90)">90 Hari lalu</button>
+          <button class="btn btn-danger btn-sm" onclick="Admin.history.confirmHapus(365)">1 Tahun lalu</button>
+        </div>
+      </div>
+      <div style="padding:8px 20px;font-size:12px;color:var(--text3);border-top:1px solid var(--border)">
+        <span id="historyInfo">—</span>
+      </div>
+    </div>
+    <div class="card">
+      <div style="overflow-x:auto">
+        <table class="data-table">
+          <thead><tr><th>Waktu</th><th>Guru</th><th>Aksi</th><th>Siswa</th><th>Mapel</th><th>Kelas</th><th>Detail</th></tr></thead>
+          <tbody id="historyBody"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px">Histori tampil setelah terhubung</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- MODAL GURU -->
+<div class="modal-overlay" id="modalGuru">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalGuruTitle">Tambah Guru Baru</span>
+      <button class="modal-close" onclick="closeModal('modalGuru')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-field"><label>Nama Lengkap *</label><input id="guruNama" placeholder="Nama guru..." /></div>
+        <div class="form-field"><label>Username *</label><input id="guruUsername" placeholder="username unik..." /></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label>Password *</label><input type="password" id="guruPassword" placeholder="min 6 karakter..." /></div>
+        <div class="form-field"><label>NIP</label><input id="guruNip" placeholder="NIP (opsional)" /></div>
+      </div>
+      <div class="form-field" style="margin-bottom:14px">
+        <label>Mata Pelajaran yang Diampu *</label>
+        <input id="guruMapel" placeholder="contoh: Matematika, Fisika (pisah koma)" />
+      </div>
+      <div class="form-field">
+        <label>Kelas yang Diajar *</label>
+        <input id="guruKelas" placeholder="contoh: X-A, X-B, XI-A (pisah koma)" />
+      </div>
+      <div class="form-row" style="margin-top:14px">
+        <div class="form-field"><label>Status</label>
+          <select id="guruStatus"><option value="Aktif">Aktif</option><option value="Tidak Aktif">Tidak Aktif</option></select></div>
+        <div class="form-field"><label>Role</label>
+          <select id="guruRole"><option value="guru">Guru</option><option value="admin">Admin</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalGuru')">Batal</button>
+      <button class="btn btn-primary" onclick="Admin.guru.save()">Simpan Guru</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SISWA -->
+<div class="modal-overlay" id="modalSiswa">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalSiswaTitle">Tambah Siswa Baru</span>
+      <button class="modal-close" onclick="closeModal('modalSiswa')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-field"><label>NIS *</label><input id="siswaNis" placeholder="Nomor Induk Siswa..." /></div>
+        <div class="form-field"><label>Kelas *</label>
+          <select id="siswaKelas">
+            <option value="">— Pilih Kelas —</option>
+            <option>X-A</option><option>X-B</option><option>X-C</option><option>X-D</option>
+            <option>XI-A</option><option>XI-B</option><option>XI-C</option><option>XI-D</option>
+            <option>XII-A</option><option>XII-B</option><option>XII-C</option><option>XII-D</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field" style="margin-bottom:14px">
+        <label>Nama Lengkap *</label><input id="siswaNama" placeholder="Nama siswa..." />
+      </div>
+      <div class="form-field">
+        <label>Keterangan</label><input id="siswaKet" placeholder="Opsional..." />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modalSiswa')">Batal</button>
+      <button class="btn btn-primary" onclick="Admin.siswa.save()">Simpan Siswa</button>
+    </div>
+  </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box"><div class="spinner"></div><span class="loading-text">Memuat...</span></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!--
+  URUTAN LOAD JS — core → utils → services → modules → controllers
+-->
+
+<!-- Core -->
+<script src="js/core/config.js"></script>
+<script src="js/core/storage.js"></script>
+<script src="js/core/http.js"></script>
+<script src="js/core/ui.js"></script>
+<script src="js/core/validator.js"></script>
+
+<!-- Utils -->
+<script src="js/utils/constants.js"></script>
+<script src="js/utils/formatter.js"></script>
+<script src="js/utils/sanitizer.js"></script>
+<script src="js/utils/security.js"></script>
+
+<!-- Services -->
+<script src="js/services/bus.js"></script>
+<script src="js/services/calculator.js"></script>
+<script src="js/services/session.js"></script>
+<script src="js/services/api.js"></script>
+<script src="js/services/auth.js"></script>
+
+<!-- Modules admin -->
+<script src="js/admin/modules/dashboard.js"></script>
+<script src="js/admin/modules/guru.js"></script>
+<script src="js/admin/modules/siswa.js"></script>
+<script src="js/admin/modules/nilai.js"></script>
+<script src="js/admin/modules/history.js"></script>
+
+<!-- Controller admin -->
+<script src="js/admin/controllers/AdminController.js"></script>
+
+<script>
+function togglePassword(inputId, btn) {
+  const input    = document.getElementById(inputId);
+  const isHidden = input.type === 'password';
+  input.type     = isHidden ? 'text' : 'password';
+  btn.querySelector('.eye-open').style.display   = isHidden ? 'none' : '';
+  btn.querySelector('.eye-closed').style.display = isHidden ? '' : 'none';
+  input.focus();
+}
+</script>
+</body>
+</html>

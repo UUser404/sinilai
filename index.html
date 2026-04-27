@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SiNilai — Portal Guru</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/guru.css" />
+  <script src="js/core/guard.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon">📚</div>
+      <div class="brand">Si<span>Nilai</span></div>
+    </div>
+    <div class="login-title">Portal Input Nilai</div>
+    <div class="login-sub">Masuk menggunakan akun guru yang telah terdaftar</div>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="username guru..." autocomplete="username" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="field-password-wrap">
+        <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" />
+        <button type="button" class="btn-show-pass" onclick="togglePassword('loginPass',this)" tabindex="-1" aria-label="Tampilkan password">
+          <svg class="eye-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path class="eye-open" d="M10 4C5.5 4 2 10 2 10s3.5 6 8 6 8-6 8-6-3.5-6-8-6zm0 10a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z" fill="currentColor"/>
+            <path class="eye-closed" style="display:none" d="M3 3l14 14M10 4C5.5 4 2 10 2 10s1 1.5 2.5 3M17.5 7C19 8.5 18 10 18 10s-3.5 6-8 6a7.2 7.2 0 01-3-.65" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <button class="btn-primary" id="btnLogin" onclick="App.login()">
+      <span id="loginBtnText">Masuk →</span>
+    </button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- MOBILE TOPBAR (desktop only, hidden on mobile via CSS) -->
+<div class="g-mobile-topbar" id="gMobileTopbar">
+  <button class="g-hamburger" onclick="App.toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="g-mobile-brand">Si<span>Nilai</span></div>
+  <div style="width:38px"></div>
+</div>
+<div class="g-sidebar-overlay" id="g-sidebar-overlay" onclick="App.closeSidebar()"></div>
+
+<!-- APP SHELL -->
+<div id="appScreen" style="display:none">
+
+  <!-- SIDEBAR (desktop) -->
+  <aside class="g-sidebar">
+    <div class="g-sidebar-brand">Si<span>Nilai</span><small>Portal Guru</small></div>
+    <nav class="g-sidebar-nav">
+      <div class="g-nav-label">Menu</div>
+      <div class="g-nav-group" id="nav-group-nilai">
+        <button class="g-nav-parent" onclick="App.toggleGroup('nav-group-nilai')">
+          <span class="g-nav-icon">📝</span>
+          <span class="g-nav-parent-text">Nilai</span>
+          <span class="g-nav-chevron">›</span>
+        </button>
+        <div class="g-nav-children">
+          <button class="g-nav-item" data-page="nilai" onclick="App.showPage('nilai',this)">Input Nilai</button>
+          <button class="g-nav-item" data-page="dashboard" onclick="App.showPage('dashboard',this)">Ringkasan Kelas</button>
+          <button class="g-nav-item" data-page="ranking" onclick="App.showPage('ranking',this)">Ranking Siswa</button>
+        </div>
+      </div>
+      <button class="g-nav-item" data-page="export" onclick="App.showPage('export',this)">
+        <span class="g-nav-icon">📤</span> Export Nilai
+      </button>
+      <div class="g-nav-label">Akun</div>
+      <button class="g-nav-item" data-page="profil" onclick="App.showPage('profil',this)">
+        <span class="g-nav-icon">👤</span> Pengaturan Akun
+      </button>
+    </nav>
+    <div class="g-sidebar-footer">
+      <div class="g-user-chip">
+        <div class="avatar" id="userAvatar">-</div>
+        <div class="g-user-info">
+          <span id="userName">-</span>
+          <small>Guru</small>
+        </div>
+      </div>
+      <button class="g-btn-logout" onclick="App.logout()">Keluar</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="g-main">
+
+    <!-- BERANDA (mobile only) -->
+    <div class="g-page" id="g-page-home">
+      <div id="home-content">
+        <div class="analisis-empty"><div class="analisis-empty-icon">🏠</div><p>Memuat beranda...</p></div>
+      </div>
+    </div>
+
+    <!-- INPUT NILAI -->
+    <div class="g-page" id="g-page-nilai">
+      <div class="g-page-header"><h2>📝 Input Nilai</h2><p>Pilih konteks lalu isi nilai siswa</p></div>
+      <div class="step-header">
+        <div class="step-title"><span class="step-num">1</span> Pilih Konteks Penilaian</div>
+        <div class="context-grid">
+          <div class="ctx-field">
+            <label>Tahun Ajaran</label>
+            <select id="ctxTahun">
+              <option value="">— Pilih —</option>
+              <option>2024/2025</option><option>2025/2026</option><option>2026/2027</option>
+            </select>
+          </div>
+          <div class="ctx-field">
+            <label>Semester</label>
+            <select id="ctxSemester">
+              <option value="">— Pilih —</option>
+              <option>Ganjil</option><option>Genap</option>
+            </select>
+          </div>
+          <div class="ctx-field"><label>Mata Pelajaran</label><select id="ctxMapel"></select></div>
+          <div class="ctx-field"><label>Kelas</label><select id="ctxKelas"></select></div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn-load" onclick="App.loadSiswa()">📋 Tampilkan Daftar Siswa</button>
+        </div>
+      </div>
+      <div class="table-card" id="tableCard" style="display:none">
+        <div class="table-toolbar">
+          <div class="table-toolbar-left">
+            <button class="btn-back" onclick="App.kembaliKeFilter()">← Kembali</button>
+            <div class="table-info">
+              <strong id="infoKelas">-</strong> &middot; <span id="infoMapel">-</span> &middot; <span id="infoSemester">-</span>
+            </div>
+            <span class="badge-mapel" id="badgeJumlah">0 siswa</span>
+            <span id="changeIndicator" style="display:none;font-size:12px;color:var(--warn);font-weight:600">● Ada perubahan belum disimpan</span>
+          </div>
+          <div class="table-toolbar-right">
+            <button class="btn-secondary" onclick="App.downloadFormat()">⬇ Format Excel</button>
+            <label class="btn-secondary" style="cursor:pointer;margin:0">
+              ⬆ Upload Nilai
+              <input type="file" id="uploadInput" accept=".xlsx" style="display:none" onchange="App.uploadNilai(this)" />
+            </label>
+            <button class="btn-secondary btn-reset" onclick="App.resetChanges()">↺ Reset</button>
+            <button class="btn-save" id="btnSave" onclick="App.saveNilai()"><span>💾 Simpan Semua Nilai</span></button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="nilaiTable">
+            <thead>
+              <tr>
+                <th rowspan="2" class="left" style="min-width:36px">No</th>
+                <th rowspan="2" class="left" style="min-width:160px">Nama Siswa</th>
+                <th colspan="3" class="group-header col-uh">Ulangan Harian</th>
+                <th colspan="5" class="group-header col-tugas">Tugas</th>
+                <th colspan="3" class="group-header col-praktik">Praktik</th>
+                <th rowspan="2" class="col-proses" style="min-width:56px;background:#dbeafe;color:#1e40af">Nilai<br>Proses</th>
+                <th rowspan="2" class="col-pts" style="min-width:52px">PTS</th>
+                <th rowspan="2" class="col-akhir" style="min-width:58px">ASAS/<br>ASAT</th>
+                <th rowspan="2" class="col-raport" style="min-width:62px;background:#fef9e7;color:#b7791f">Nilai<br>Raport</th>
+              </tr>
+              <tr>
+                <th class="col-uh">UH 1</th><th>UH 2</th>
+                <th class="col-rata" style="background:#dbeafe;color:#1e40af;font-size:10px">Rata</th>
+                <th class="col-tugas">T1</th><th>T2</th><th>T3</th><th>T4</th>
+                <th class="col-rata" style="background:#dcfce7;color:#166534;font-size:10px">Rata</th>
+                <th class="col-praktik">P1</th><th>P2</th>
+                <th class="col-rata" style="background:#fef9c3;color:#854d0e;font-size:10px">Rata</th>
+              </tr>
+            </thead>
+            <tbody id="nilaiBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RINGKASAN KELAS -->
+    <div class="g-page" id="g-page-dashboard">
+      <div class="g-page-header"><h2>📊 Ringkasan Kelas</h2><p>Statistik dan distribusi nilai kelas yang sedang aktif</p></div>
+      <div id="dashboard-content"><div class="analisis-empty"><div class="analisis-empty-icon">📊</div><p>Muat data nilai terlebih dahulu di menu <strong>Input Nilai</strong></p></div></div>
+    </div>
+
+    <!-- RANKING SISWA -->
+    <div class="g-page" id="g-page-ranking">
+      <div class="g-page-header"><h2>🏆 Ranking Siswa</h2><p>Peringkat siswa berdasarkan nilai raport</p></div>
+      <div id="ranking-content"><div class="analisis-empty"><div class="analisis-empty-icon">🏆</div><p>Muat data nilai terlebih dahulu di menu <strong>Input Nilai</strong></p></div></div>
+    </div>
+
+    <!-- EXPORT NILAI -->
+    <div class="g-page" id="g-page-export">
+      <div class="g-page-header"><h2>📤 Export Nilai</h2><p>Unduh rekap nilai dalam format CSV</p></div>
+      <div id="export-content"><div class="analisis-empty"><div class="analisis-empty-icon">📤</div><p>Memuat halaman export...</p></div></div>
+    </div>
+
+    <!-- PROFIL / PENGATURAN AKUN -->
+    <div class="g-page" id="g-page-profil">
+      <div class="g-page-header"><h2>👤 Pengaturan Akun</h2><p>Informasi akun dan keamanan</p></div>
+      <div id="profil-content"><div class="analisis-empty"><div class="analisis-empty-icon">👤</div><p>Memuat profil...</p></div></div>
+    </div>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION (mobile only) -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bn-btn active" data-page="home" onclick="App.showBottomPage('home')">
+      <svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="bn-label">Beranda</span>
+    </button>
+    <button class="bn-btn" data-page="nilai" onclick="App.showBottomPage('nilai')">
+      <svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span class="bn-label">Nilai</span>
+    </button>
+    <button class="bn-btn" data-page="dashboard" onclick="App.showBottomPage('dashboard')">
+      <svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="bn-label">Analisis</span>
+    </button>
+    <button class="bn-btn" data-page="export" onclick="App.showBottomPage('export')">
+      <svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span class="bn-label">Export</span>
+    </button>
+    <button class="bn-btn" data-page="profil" onclick="App.showBottomPage('profil')">
+      <svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="bn-label">Profil</span>
+    </button>
+  </nav>
+
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box"><div class="spinner"></div><div class="loading-text" id="loadingText">Memuat data...</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="js/core/config.js"></script>
+<script src="js/core/storage.js"></script>
+<script src="js/core/http.js"></script>
+<script src="js/core/ui.js"></script>
+<script src="js/core/validator.js"></script>
+<script src="js/utils/constants.js"></script>
+<script src="js/utils/formatter.js"></script>
+<script src="js/utils/sanitizer.js"></script>
+<script src="js/utils/security.js"></script>
+<script src="js/services/bus.js"></script>
+<script src="js/services/calculator.js"></script>
+<script src="js/services/session.js"></script>
+<script src="js/services/api.js"></script>
+<script src="js/services/auth.js"></script>
+<script src="js/guru/modules/nilai.js"></script>
+<script src="js/guru/modules/excel.js"></script>
+<script src="js/guru/modules/analisis.js"></script>
+<script src="js/guru/modules/export.js"></script>
+<script src="js/guru/modules/home.js"></script>
+<script src="js/guru/modules/profil.js"></script>
+<script src="js/guru/controllers/GuruController.js"></script>
+
+<script>
+function togglePassword(inputId, btn) {
+  const input    = document.getElementById(inputId);
+  const isHidden = input.type === 'password';
+  input.type     = isHidden ? 'text' : 'password';
+  btn.querySelector('.eye-open').style.display   = isHidden ? 'none' : '';
+  btn.querySelector('.eye-closed').style.display = isHidden ? '' : 'none';
+  input.focus();
+}
+</script>
+</body>
+</html>
