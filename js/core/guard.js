@@ -11,7 +11,7 @@
   const path     = window.location.pathname;
   const filename = path.split('/').pop() || 'index.html';
 
-  const ALLOWED  = ['index.html', 'admin.html', ''];   // '' = root/folder = index.html
+  const ALLOWED = ['index.html', 'admin.html', 'kurikulum.html', ''];   // '' = root/folder = index.html
 
   const isAllowed = ALLOWED.some(p => filename === p || filename.endsWith('/' + p));
 
