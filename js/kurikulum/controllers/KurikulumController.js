@@ -82,7 +82,9 @@ class KurikulumController {
     }
     UI.showLoading('Masuk...');
     try {
-      const res = await api.login(username, password);
+      // Hash password sebelum dikirim ke Apps Script (SHA-256 + salt), sama seperti guru & admin
+      const hashedPass = await Security.hashPasswordAsync(password);
+      const res = await api.login(username, hashedPass);
       if (res.status === 'ok' && res.role === 'kurikulum') {
         sessionStorage.setItem('sinilai_kuri_session', JSON.stringify({ username, nama: res.nama || username }));
         UI.hideLoading();

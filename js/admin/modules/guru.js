@@ -75,6 +75,13 @@ class GuruModule {
     if (errMsg) { UI.showToast(errMsg, 'error'); return; }
 
     const isEdit = UI.$('modalGuruTitle').textContent.includes('Edit');
+
+    // Hash password sebelum dikirim ke Apps Script
+    // Jika edit dan password kosong, biarkan kosong (backend akan pertahankan password lama)
+    if (payload.password && payload.password.trim() !== '') {
+      payload.password = await Security.hashPasswordAsync(payload.password);
+    }
+
     UI.showLoading();
     try {
       const res = await (isEdit ? api.editGuru(payload) : api.addGuru(payload));
