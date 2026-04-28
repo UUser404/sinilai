@@ -6,606 +6,13 @@
 <title>SiNilai — Kurikulum</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/admin.css" />
+<link rel="stylesheet" href="css/kurikulum.css" />
 <script src="js/core/guard.js"></script>
-<style>
-
-/* ══════════════════════════════════════════════
-   DESKTOP — SPLIT LAYOUT
-══════════════════════════════════════════════ */
-.kuri-layout {
-  display: flex; height: calc(100vh - 0px); overflow: hidden;
-  margin-left: var(--sidebar-w);
-}
-.kuri-list {
-  width: 280px; flex-shrink: 0;
-  background: var(--surface); border-right: 1px solid var(--border);
-  display: flex; flex-direction: column; height: 100vh; overflow: hidden;
-  position: fixed; top: 0; left: var(--sidebar-w); z-index: 40;
-}
-.kuri-list-top {
-  padding: 14px 14px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0;
-}
-.kuri-list-title {
-  font-size: 11px; font-weight: 700; color: var(--text3);
-  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;
-}
-.kuri-search { position: relative; }
-.kuri-search svg {
-  position: absolute; left: 9px; top: 50%; transform: translateY(-50%);
-  width: 13px; height: 13px; color: var(--text3);
-}
-.kuri-search input {
-  width: 100%; padding: 7px 9px 7px 28px;
-  background: var(--surface2); border: 1px solid var(--border2);
-  border-radius: var(--radius-sm); color: var(--text);
-  font-family: inherit; font-size: 12px; outline: none;
-}
-.kuri-search input:focus { border-color: var(--primary); }
-.kuri-search input::placeholder { color: var(--text3); }
-
-.guru-items { flex: 1; overflow-y: auto; padding: 6px; }
-.guru-items::-webkit-scrollbar { width: 3px; }
-.guru-items::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
-
-.guru-entry {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 10px; border-radius: var(--radius-sm);
-  cursor: pointer; transition: all 0.15s; margin-bottom: 1px;
-  border: 1px solid transparent;
-}
-.guru-entry:hover { background: var(--surface2); }
-.guru-entry.active { background: var(--primary-light); border-color: rgba(59,130,246,0.2); }
-
-.ge-av {
-  width: 34px; height: 34px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700; color: white; flex-shrink: 0;
-}
-.ge-name { font-size: 12px; font-weight: 600; color: var(--text); }
-.ge-sub { font-size: 10px; color: var(--text2); margin-top: 1px; }
-.ge-dot { width: 7px; height: 7px; border-radius: 50%; margin-left: auto; flex-shrink: 0; }
-.ge-dot.ok { background: var(--success); }
-.ge-dot.empty { background: var(--error); }
-
-/* ── DETAIL PANE ── */
-.kuri-detail {
-  flex: 1; margin-left: 280px; display: flex; flex-direction: column;
-  height: 100vh; overflow: hidden;
-}
-.kd-topbar {
-  padding: 13px 22px; border-bottom: 1px solid var(--border);
-  background: var(--surface); display: flex; align-items: center;
-  justify-content: space-between; flex-shrink: 0;
-}
-.kd-title { font-size: 14px; font-weight: 700; color: var(--text); }
-.kd-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
-.kd-scroll { flex: 1; overflow-y: auto; padding: 20px 22px; }
-.kd-scroll::-webkit-scrollbar { width: 4px; }
-.kd-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
-
-/* STATS PILLS */
-.stats-pills { display: flex; gap: 10px; margin-bottom: 16px; }
-.stat-pill {
-  padding: 10px 16px; border-radius: var(--radius-sm);
-  background: var(--surface); border: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-}
-.sp-val { font-size: 20px; font-weight: 800; color: var(--text); }
-.sp-lbl { font-size: 10px; color: var(--text2); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
-
-/* STEP CARDS */
-.step-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); margin-bottom: 14px; overflow: hidden;
-}
-.step-head {
-  padding: 12px 16px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-  background: var(--surface2);
-}
-.step-num {
-  width: 22px; height: 22px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700; flex-shrink: 0;
-}
-.step-num.s1 { background: var(--primary-light); color: var(--primary); }
-.step-num.s2 { background: var(--accent-light); color: var(--accent); }
-.step-title { font-size: 13px; font-weight: 700; color: var(--text); }
-.step-hint { font-size: 11px; color: var(--text2); margin-left: auto; }
-.step-body { padding: 14px 16px; }
-
-/* MAPEL CHIPS */
-.mapel-chip-grid { display: flex; flex-wrap: wrap; gap: 7px; }
-.mc {
-  padding: 7px 13px; border-radius: var(--radius-sm);
-  font-size: 12px; font-weight: 600;
-  border: 1.5px solid var(--border2); color: var(--text2);
-  cursor: pointer; transition: all 0.15s; font-family: inherit;
-  background: transparent; display: flex; align-items: center; gap: 6px;
-}
-.mc:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
-.mc.on { border-color: var(--primary); background: var(--primary); color: white; }
-.mc .mc-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.7; flex-shrink: 0; }
-
-/* ACCORDION */
-.acc-list { display: flex; flex-direction: column; gap: 6px; }
-.acc-item {
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  overflow: hidden; transition: border-color 0.15s;
-}
-.acc-item.open { border-color: var(--primary); }
-.acc-head {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 14px; cursor: pointer; background: var(--surface2);
-  transition: background 0.15s; user-select: none;
-}
-.acc-head:hover { background: var(--surface); }
-.acc-item.open .acc-head { background: var(--primary-light); }
-.acc-mdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.acc-mapel { font-size: 12px; font-weight: 700; color: var(--text); flex: 1; }
-.acc-item.open .acc-mapel { color: var(--primary); }
-.acc-kcount {
-  font-size: 10px; font-weight: 600; padding: 2px 7px;
-  border-radius: 4px; background: rgba(255,255,255,0.06); color: var(--text2);
-}
-.acc-item.open .acc-kcount { background: var(--primary-light); color: var(--primary); }
-.acc-arrow { font-size: 10px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
-.acc-item.open .acc-arrow { transform: rotate(180deg); color: var(--primary); }
-.acc-del {
-  width: 22px; height: 22px; border-radius: 4px; background: transparent;
-  border: none; color: var(--text3); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; transition: all 0.15s;
-}
-.acc-del:hover { background: var(--error-bg); color: var(--error); }
-.acc-body {
-  display: none; padding: 12px 14px;
-  border-top: 1px solid var(--border); background: var(--bg);
-  animation: fadeIn 0.2s ease;
-}
-.acc-item.open .acc-body { display: block; }
-.tingkat-sec { margin-bottom: 10px; }
-.tingkat-sec:last-child { margin-bottom: 0; }
-.tingkat-row {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;
-}
-.tingkat-lbl { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
-.tingkat-selall {
-  font-size: 10px; font-weight: 600; color: var(--primary);
-  cursor: pointer; border: none; background: none; font-family: inherit; transition: opacity 0.15s;
-}
-.tingkat-selall:hover { opacity: 0.7; }
-.kelas-chips { display: flex; flex-wrap: wrap; gap: 5px; }
-.kchip {
-  padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;
-  border: 1px solid var(--border2); color: var(--text2); background: var(--surface);
-  cursor: pointer; transition: all 0.12s; font-family: inherit;
-}
-.kchip:hover { border-color: var(--primary); color: var(--primary); }
-.kchip.on { background: var(--primary); border-color: var(--primary); color: white; }
-.empty-acc {
-  text-align: center; padding: 24px; font-size: 12px;
-  color: var(--text3); font-style: italic;
-}
-
-/* SAVE BAR */
-.save-bar {
-  padding: 12px 22px; background: var(--surface);
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  flex-shrink: 0; max-height: 0; overflow: hidden; opacity: 0;
-  transition: max-height 0.3s, opacity 0.3s, padding 0.3s;
-}
-.save-bar.show { max-height: 56px; opacity: 1; }
-.sb-txt { font-size: 12px; color: var(--text2); }
-.sb-txt strong { color: var(--accent); }
-
-/* KELOLA MAPEL */
-.mapel-manage-page { padding: 22px; display: none; height: 100%; overflow-y: auto; }
-.mapel-manage-page.active { display: block; }
-.mapel-add-row { display: flex; gap: 8px; margin-bottom: 18px; align-items: center; }
-.mapel-add-input {
-  flex: 1; padding: 9px 12px; background: var(--surface2);
-  border: 1.5px solid var(--border2); border-radius: var(--radius-sm);
-  color: var(--text); font-family: inherit; font-size: 13px; outline: none; max-width: 320px;
-}
-.mapel-add-input:focus { border-color: var(--primary); }
-.mapel-add-input::placeholder { color: var(--text3); }
-.mapel-table-wrap {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); overflow: hidden;
-}
-.mapel-row-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 16px; border-bottom: 1px solid var(--border); transition: background 0.1s;
-}
-.mapel-row-item:last-child { border-bottom: none; }
-.mapel-row-item:hover { background: var(--surface2); }
-.mr-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.mr-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
-.mr-usage { font-size: 11px; color: var(--text2); padding: 2px 8px; background: var(--surface2); border-radius: 4px; }
-.mr-edit-input {
-  flex: 1; padding: 5px 9px; background: var(--bg);
-  border: 1.5px solid var(--primary); border-radius: var(--radius-sm);
-  color: var(--text); font-family: inherit; font-size: 13px; outline: none; display: none;
-}
-.mr-edit-input.show { display: block; }
-.mr-actions { display: flex; gap: 6px; }
-
-/* DAMPAK MODAL */
-.dampak-list { margin: 14px 0; max-height: 200px; overflow-y: auto; }
-.dampak-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 12px; border-radius: var(--radius-sm);
-  background: var(--surface2); margin-bottom: 6px;
-}
-.dampak-item:last-child { margin-bottom: 0; }
-.dampak-av {
-  width: 28px; height: 28px; border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700; color: white; flex-shrink: 0; background: var(--primary);
-}
-.dampak-name { font-size: 12px; font-weight: 600; color: var(--text); }
-.dampak-desc { font-size: 11px; color: var(--text2); margin-top: 1px; }
-.dampak-warning {
-  padding: 10px 14px; border-radius: var(--radius-sm);
-  background: var(--accent-light); border: 1px solid rgba(245,158,11,0.3);
-  font-size: 12px; color: var(--accent); margin-bottom: 12px;
-}
-
-/* DOTS */
-.dot-blue{background:#3b82f6}.dot-green{background:#10b981}.dot-amber{background:#f59e0b}
-.dot-purple{background:#a78bfa}.dot-rose{background:#f43f5e}.dot-cyan{background:#06b6d4}
-.dot-orange{background:#f97316}.dot-teal{background:#14b8a6}.dot-indigo{background:#6366f1}
-.dot-lime{background:#84cc16}
-
-/* ══════════════════════════════════════════════
-   MOBILE TOPBAR
-══════════════════════════════════════════════ */
-.k-mobile-topbar {
-  display: none;
-  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  height: 52px; background: var(--surface); border-bottom: 1px solid var(--border);
-  align-items: center; justify-content: space-between; padding: 0 14px;
-}
-.k-mobile-brand { font-size: 15px; font-weight: 800; color: var(--text); }
-.k-mobile-brand span { color: var(--primary); }
-.k-mobile-brand small { font-size: 10px; font-weight: 500; color: var(--text3); margin-left: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
-.k-topbar-actions { display: flex; gap: 6px; }
-.k-topbar-save-btn {
-  padding: 6px 12px; border-radius: var(--radius-sm);
-  background: var(--primary); color: white; border: none;
-  font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit;
-  display: none;
-}
-.k-topbar-save-btn.show { display: block; }
-
-/* ══════════════════════════════════════════════
-   MOBILE — BOTTOM NAVIGATION
-══════════════════════════════════════════════ */
-.k-bottom-nav {
-  display: none;
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
-  height: 60px; background: var(--surface); border-top: 1px solid var(--border);
-  align-items: center; justify-content: space-around;
-}
-.k-bn-btn {
-  flex: 1; height: 100%; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 3px;
-  background: transparent; border: none; cursor: pointer;
-  transition: all 0.15s; position: relative;
-}
-.k-bn-icon { width: 20px; height: 20px; color: var(--text3); transition: color 0.15s; }
-.k-bn-label { font-size: 10px; font-weight: 600; color: var(--text3); transition: color 0.15s; font-family: inherit; }
-.k-bn-btn.active .k-bn-icon { color: var(--primary); }
-.k-bn-btn.active .k-bn-label { color: var(--primary); }
-.k-bn-btn.active::after {
-  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-  width: 28px; height: 2px; background: var(--primary); border-radius: 0 0 2px 2px;
-}
-.k-bn-badge {
-  position: absolute; top: 6px; right: calc(50% - 18px);
-  width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
-  border: 2px solid var(--surface); display: none;
-}
-.k-bn-badge.show { display: block; }
-
-/* ══════════════════════════════════════════════
-   MOBILE PAGES
-══════════════════════════════════════════════ */
-.k-mobile-pages { display: none; }
-
-.k-page {
-  display: none; padding: 14px 14px calc(74px + env(safe-area-inset-bottom));
-  min-height: 100vh; overflow-y: auto;
-}
-.k-page.active { display: block; }
-
-/* Mobile page header */
-.k-page-header {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 14px;
-}
-.k-page-back {
-  width: 34px; height: 34px; border-radius: 8px; background: var(--surface2);
-  border: 1px solid var(--border); display: flex; align-items: center;
-  justify-content: center; cursor: pointer; font-size: 14px; flex-shrink: 0;
-}
-.k-page-title { font-size: 15px; font-weight: 700; color: var(--text); }
-.k-page-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
-
-/* Mobile guru list */
-.k-guru-list-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 10px;
-}
-.k-guru-list-title { font-size: 13px; font-weight: 700; color: var(--text); }
-.k-guru-count { font-size: 11px; color: var(--text2); }
-.k-guru-search-wrap { margin-bottom: 12px; position: relative; }
-.k-guru-search-wrap svg {
-  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-  width: 14px; height: 14px; color: var(--text3);
-}
-.k-guru-search {
-  width: 100%; padding: 9px 12px 9px 32px;
-  background: var(--surface2); border: 1px solid var(--border2);
-  border-radius: var(--radius-sm); color: var(--text);
-  font-family: inherit; font-size: 13px; outline: none;
-}
-.k-guru-search:focus { border-color: var(--primary); }
-
-.k-guru-card {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 14px; border-radius: var(--radius);
-  background: var(--surface); border: 1px solid var(--border);
-  margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
-  text-align: left; width: 100%;
-}
-.k-guru-card:hover, .k-guru-card:active { background: var(--surface2); border-color: var(--primary); }
-.k-guru-av {
-  width: 40px; height: 40px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 700; color: white; flex-shrink: 0;
-}
-.k-guru-av-name { font-size: 13px; font-weight: 700; color: var(--text); }
-.k-guru-av-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
-.k-guru-status { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-.k-guru-dot { width: 8px; height: 8px; border-radius: 50%; }
-.k-guru-dot.ok { background: var(--success); }
-.k-guru-dot.empty { background: var(--error); }
-.k-guru-chevron { font-size: 14px; color: var(--text3); }
-
-/* Mobile detail guru */
-.k-detail-header {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px; background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); margin-bottom: 14px;
-}
-.k-detail-av {
-  width: 44px; height: 44px; border-radius: 11px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; font-weight: 700; color: white; flex-shrink: 0;
-}
-.k-detail-name { font-size: 14px; font-weight: 700; color: var(--text); }
-.k-detail-nip { font-size: 11px; color: var(--text2); margin-top: 2px; }
-.k-detail-stats { display: flex; gap: 8px; margin-left: auto; }
-.k-detail-stat {
-  text-align: center; padding: 6px 10px;
-  background: var(--surface2); border-radius: var(--radius-sm);
-}
-.k-detail-stat-val { font-size: 16px; font-weight: 800; color: var(--text); }
-.k-detail-stat-lbl { font-size: 9px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
-
-/* Mobile step card */
-.k-step-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); margin-bottom: 12px; overflow: hidden;
-}
-.k-step-head {
-  padding: 11px 14px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 8px; background: var(--surface2);
-}
-.k-step-num {
-  width: 20px; height: 20px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 700; flex-shrink: 0;
-}
-.k-step-num.s1 { background: var(--primary-light); color: var(--primary); }
-.k-step-num.s2 { background: var(--accent-light); color: var(--accent); }
-.k-step-title { font-size: 12px; font-weight: 700; color: var(--text); }
-.k-step-body { padding: 12px 14px; }
-
-/* Mobile mapel chips */
-.k-mapel-grid { display: flex; flex-wrap: wrap; gap: 7px; }
-.k-mc {
-  padding: 8px 14px; border-radius: var(--radius-sm);
-  font-size: 13px; font-weight: 600;
-  border: 1.5px solid var(--border2); color: var(--text2);
-  cursor: pointer; transition: all 0.15s; font-family: inherit;
-  background: transparent; display: flex; align-items: center; gap: 6px;
-}
-.k-mc:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
-.k-mc.on { border-color: var(--primary); background: var(--primary); color: white; }
-.k-mc .k-mc-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.7; flex-shrink: 0; }
-
-/* Mobile accordion */
-.k-acc-list { display: flex; flex-direction: column; gap: 7px; }
-.k-acc-item {
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  overflow: hidden; transition: border-color 0.15s;
-}
-.k-acc-item.open { border-color: var(--primary); }
-.k-acc-head {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 14px; cursor: pointer; background: var(--surface2);
-  transition: background 0.15s; user-select: none;
-}
-.k-acc-item.open .k-acc-head { background: var(--primary-light); }
-.k-acc-mdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.k-acc-mapel { font-size: 13px; font-weight: 700; color: var(--text); flex: 1; }
-.k-acc-item.open .k-acc-mapel { color: var(--primary); }
-.k-acc-kcount {
-  font-size: 11px; font-weight: 600; padding: 2px 8px;
-  border-radius: 4px; background: rgba(255,255,255,0.06); color: var(--text2);
-}
-.k-acc-item.open .k-acc-kcount { background: var(--primary-light); color: var(--primary); }
-.k-acc-arrow { font-size: 12px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
-.k-acc-item.open .k-acc-arrow { transform: rotate(180deg); color: var(--primary); }
-.k-acc-del {
-  width: 28px; height: 28px; border-radius: 6px; background: transparent;
-  border: none; color: var(--text3); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; transition: all 0.15s;
-}
-.k-acc-del:hover, .k-acc-del:active { background: var(--error-bg); color: var(--error); }
-.k-acc-body {
-  display: none; padding: 14px;
-  border-top: 1px solid var(--border); background: var(--bg);
-  animation: fadeIn 0.2s ease;
-}
-.k-acc-item.open .k-acc-body { display: block; }
-
-.k-tingkat-sec { margin-bottom: 12px; }
-.k-tingkat-sec:last-child { margin-bottom: 0; }
-.k-tingkat-row {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px;
-}
-.k-tingkat-lbl { font-size: 10px; font-weight: 700; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
-.k-tingkat-selall {
-  font-size: 11px; font-weight: 600; color: var(--primary);
-  cursor: pointer; border: none; background: none; font-family: inherit;
-}
-.k-kelas-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.k-kchip {
-  padding: 6px 12px; border-radius: 5px; font-size: 12px; font-weight: 600;
-  border: 1px solid var(--border2); color: var(--text2); background: var(--surface);
-  cursor: pointer; transition: all 0.12s; font-family: inherit;
-}
-.k-kchip:hover { border-color: var(--primary); color: var(--primary); }
-.k-kchip.on { background: var(--primary); border-color: var(--primary); color: white; }
-
-/* Mobile floating save bar */
-.k-float-save {
-  position: fixed; bottom: calc(60px + env(safe-area-inset-bottom) + 8px);
-  left: 14px; right: 14px; z-index: 90;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 10px 14px;
-  display: flex; align-items: center; justify-content: space-between;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-  transform: translateY(20px); opacity: 0; pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-}
-.k-float-save.show { transform: translateY(0); opacity: 1; pointer-events: all; }
-.k-float-save-txt { font-size: 12px; color: var(--text2); }
-.k-float-save-txt strong { color: var(--accent); }
-
-/* Mobile kelola mapel */
-.k-mapel-page { padding-bottom: 16px; }
-.k-mapel-add-row {
-  display: flex; gap: 8px; margin-bottom: 14px;
-}
-.k-mapel-input {
-  flex: 1; padding: 10px 12px; background: var(--surface2);
-  border: 1.5px solid var(--border2); border-radius: var(--radius-sm);
-  color: var(--text); font-family: inherit; font-size: 13px; outline: none;
-}
-.k-mapel-input:focus { border-color: var(--primary); }
-.k-mapel-table {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); overflow: hidden;
-}
-.k-mapel-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 14px; border-bottom: 1px solid var(--border);
-  transition: background 0.1s;
-}
-.k-mapel-row:last-child { border-bottom: none; }
-.k-mapel-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.k-mapel-name { font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
-.k-mapel-usage {
-  font-size: 11px; color: var(--text2); padding: 2px 8px;
-  background: var(--surface2); border-radius: 4px; white-space: nowrap;
-}
-.k-mapel-edit-input {
-  flex: 1; padding: 6px 10px; background: var(--bg);
-  border: 1.5px solid var(--primary); border-radius: var(--radius-sm);
-  color: var(--text); font-family: inherit; font-size: 13px; outline: none; display: none;
-}
-.k-mapel-edit-input.show { display: block; }
-.k-mapel-btns { display: flex; gap: 6px; }
-
-/* Mobile home / beranda */
-.k-home-stats {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;
-}
-.k-stat-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px;
-  display: flex; flex-direction: column; gap: 4px;
-}
-.k-stat-val { font-size: 24px; font-weight: 800; color: var(--text); }
-.k-stat-lbl { font-size: 11px; color: var(--text2); font-weight: 500; }
-.k-stat-icon { font-size: 20px; margin-bottom: 4px; }
-
-.k-quick-title {
-  font-size: 11px; font-weight: 700; color: var(--text3);
-  letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 10px;
-}
-.k-quick-btn {
-  display: flex; align-items: center; gap: 12px;
-  padding: 13px 14px; border-radius: var(--radius);
-  background: var(--surface); border: 1px solid var(--border);
-  margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
-  width: 100%; text-align: left;
-}
-.k-quick-btn:hover, .k-quick-btn:active { background: var(--primary-light); border-color: var(--primary); }
-.k-quick-icon {
-  width: 36px; height: 36px; border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px; flex-shrink: 0;
-}
-.k-quick-icon.blue { background: var(--primary-light); }
-.k-quick-icon.purple { background: var(--accent-light); }
-.k-quick-txt { font-size: 13px; font-weight: 600; color: var(--text); }
-.k-quick-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
-.k-quick-chevron { margin-left: auto; font-size: 14px; color: var(--text3); }
-
-/* Empty / loading states */
-.k-empty {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 40px 20px; gap: 10px;
-  color: var(--text3); text-align: center;
-}
-.k-empty-icon { font-size: 40px; }
-.k-empty-title { font-size: 14px; font-weight: 600; color: var(--text2); }
-.k-empty-sub { font-size: 12px; }
-
-/* ══════════════════════════════════════════════
-   RESPONSIVE BREAKPOINTS
-══════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  /* hide desktop elements */
-  .sidebar { display: none; }
-  .kuri-layout { display: none !important; }
-  .main { display: none !important; }
-
-  /* show mobile elements */
-  .k-mobile-topbar { display: flex; }
-  .k-bottom-nav { display: flex; }
-  .k-mobile-pages { display: block; }
-
-  /* login tweaks */
-  .login-card { margin: 0; border-radius: 0; min-height: 100vh; justify-content: center; }
-}
-
-@keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
-@keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-</style>
 </head>
 <body>
 
 <!-- ═══════════════════════════════════════════════════
-     LOGIN (shared desktop + mobile)
+     LOGIN
 ═══════════════════════════════════════════════════ -->
 <div id="loginScreen">
   <div class="login-card">
@@ -619,14 +26,14 @@
       <label>Password</label>
       <div class="field-password-wrap">
         <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" />
-        <button type="button" class="btn-show-pass" onclick="togglePassword('loginPass',this)" tabindex="-1">
+        <button type="button" class="btn-show-pass" onclick="togglePassword('loginPass', this)" tabindex="-1">
           <svg class="eye-icon" viewBox="0 0 20 20" fill="none">
             <path class="eye-open" d="M10 4C5.5 4 2 10 2 10s3.5 6 8 6 8-6 8-6-3.5-6-8-6zm0 10a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z" fill="currentColor"/>
           </svg>
         </button>
       </div>
     </div>
-    <button class="btn-login" onclick="Kurikulum.login()">Masuk</button>
+    <button class="btn-login" onclick="App.login()">Masuk</button>
     <div class="login-err" id="loginErr"></div>
   </div>
 </div>
@@ -637,7 +44,7 @@
 <div class="k-mobile-topbar" id="kMobileTopbar">
   <div class="k-mobile-brand">Si<span>Nilai</span><small>Kurikulum</small></div>
   <div class="k-topbar-actions">
-    <button class="k-topbar-save-btn" id="kTopbarSaveBtn" onclick="Kurikulum.penugasan.save()">💾 Simpan</button>
+    <button class="k-topbar-save-btn" id="kTopbarSaveBtn" onclick="App.penugasan.save()">💾 Simpan</button>
   </div>
 </div>
 
@@ -648,10 +55,10 @@
   <div class="sidebar-brand">Si<span>Nilai</span><small>Kurikulum</small></div>
   <nav class="sidebar-nav">
     <div class="nav-label">Menu</div>
-    <button class="nav-item active" id="navPenugasan" onclick="Kurikulum.showPage('penugasan',this)">
+    <button class="nav-item active" id="navPenugasan" onclick="App.showPage('penugasan', this)">
       <span class="icon">📋</span> Penugasan Guru
     </button>
-    <button class="nav-item" id="navMapel" onclick="Kurikulum.showPage('mapel',this)">
+    <button class="nav-item" id="navMapel" onclick="App.showPage('mapel', this)">
       <span class="icon">📚</span> Kelola Mata Pelajaran
     </button>
   </nav>
@@ -663,7 +70,7 @@
         <span id="kuriName">—</span>
       </div>
     </div>
-    <button class="btn-logout" onclick="Kurikulum.logout()">Keluar</button>
+    <button class="btn-logout" onclick="App.logout()">Keluar</button>
   </div>
 </div>
 
@@ -672,13 +79,14 @@
 ═══════════════════════════════════════════════════ -->
 <div class="main" id="mainArea" style="display:none; margin-left:0; padding:0;">
   <div class="kuri-layout">
+
     <!-- GURU LIST -->
     <div class="kuri-list" id="kuriListPanel">
       <div class="kuri-list-top">
         <div class="kuri-list-title">Daftar Guru <span id="guruCountBadge" style="font-weight:400;color:var(--text2)"></span></div>
         <div class="kuri-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input type="text" id="guruSearchInput" placeholder="Cari nama guru..." oninput="Kurikulum.filterGuru(this.value)">
+          <input type="text" id="guruSearchInput" placeholder="Cari nama guru..." oninput="App.filterGuru(this.value)" />
         </div>
       </div>
       <div class="guru-items" id="guruItems">
@@ -688,20 +96,20 @@
 
     <!-- DETAIL -->
     <div class="kuri-detail" id="kuriDetail">
-      <!-- TOPBAR PENUGASAN -->
+
+      <!-- Topbar penugasan -->
       <div class="kd-topbar" id="kdTopbarPenugasan">
         <div>
           <div class="kd-title" id="kdTitle">Pilih guru di kiri</div>
-          <div class="kd-sub" id="kdSub">untuk mulai mengatur penugasan</div>
+          <div class="kd-sub"   id="kdSub">untuk mulai mengatur penugasan</div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="stats-pills" id="detailStats" style="margin:0;display:none">
-            <div class="stat-pill"><div><div class="sp-val" id="spMapel">0</div><div class="sp-lbl">Mapel</div></div></div>
-            <div class="stat-pill"><div><div class="sp-val" id="spKelas">0</div><div class="sp-lbl">Kelas</div></div></div>
-          </div>
+        <div class="stats-pills" id="detailStats" style="margin:0;display:none">
+          <div class="stat-pill"><div><div class="sp-val" id="spMapel">0</div><div class="sp-lbl">Mapel</div></div></div>
+          <div class="stat-pill"><div><div class="sp-val" id="spKelas">0</div><div class="sp-lbl">Kelas</div></div></div>
         </div>
       </div>
-      <!-- TOPBAR MAPEL -->
+
+      <!-- Topbar kelola mapel -->
       <div class="kd-topbar" id="kdTopbarMapel" style="display:none">
         <div>
           <div class="kd-title">📚 Kelola Mata Pelajaran</div>
@@ -709,7 +117,7 @@
         </div>
       </div>
 
-      <!-- KONTEN PENUGASAN -->
+      <!-- Konten penugasan -->
       <div class="kd-scroll" id="pagePenugasan">
         <div id="emptyState" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60%;color:var(--text3);gap:12px">
           <div style="font-size:48px">👈</div>
@@ -742,103 +150,76 @@
         </div>
       </div>
 
-      <!-- KONTEN KELOLA MAPEL -->
+      <!-- Konten kelola mapel -->
       <div class="mapel-manage-page" id="pageMapel">
-        <div class="page-header" style="margin-bottom:18px">
+        <div style="margin-bottom:18px">
           <h2 style="font-size:18px">📚 Mata Pelajaran</h2>
-          <p style="font-size:12px">Perubahan nama akan memperbarui penugasan semua guru secara otomatis</p>
+          <p style="font-size:12px;color:var(--text2);margin-top:4px">Perubahan nama akan memperbarui penugasan semua guru secara otomatis</p>
         </div>
         <div class="mapel-add-row">
           <input class="mapel-add-input" id="newMapelInput" placeholder="Nama mata pelajaran baru..." />
-          <button class="btn btn-primary" onclick="Kurikulum.mapel.tambah()">+ Tambah</button>
+          <button class="btn btn-primary" onclick="App.mapel.tambah()">+ Tambah</button>
         </div>
         <div class="mapel-table-wrap" id="mapelTableWrap">
           <div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">⏳ Memuat...</div>
         </div>
       </div>
 
-      <!-- SAVE BAR -->
+      <!-- Save bar desktop -->
       <div class="save-bar" id="savePenugasanBar">
         <div class="sb-txt">Ada <strong>perubahan belum disimpan</strong></div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost btn-sm" onclick="Kurikulum.penugasan.cancel()">Batalkan</button>
-          <button class="btn btn-primary btn-sm" onclick="Kurikulum.penugasan.save()">💾 Simpan Penugasan</button>
+          <button class="btn btn-ghost btn-sm"   onclick="App.penugasan.cancel()">Batalkan</button>
+          <button class="btn btn-primary btn-sm" onclick="App.penugasan.save()">💾 Simpan Penugasan</button>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+
+    </div><!-- /kuri-detail -->
+  </div><!-- /kuri-layout -->
+</div><!-- /main -->
 
 <!-- ═══════════════════════════════════════════════════
      MOBILE PAGES
 ═══════════════════════════════════════════════════ -->
-<div class="k-mobile-pages" id="kMobilePages" style="display:none;">
+<div class="k-mobile-pages" id="kMobilePages" style="display:none">
 
   <!-- BERANDA -->
   <div class="k-page active" id="k-page-home">
-    <div style="padding-top:52px">
-      <div style="padding:14px 14px 0">
-        <div style="margin-bottom:14px">
-          <div style="font-size:18px;font-weight:800;color:var(--text)">Selamat datang 👋</div>
-          <div style="font-size:12px;color:var(--text2);margin-top:2px" id="kHomeName">—</div>
-        </div>
-        <!-- Stats -->
-        <div class="k-home-stats" id="kHomeStats">
-          <div class="k-stat-card">
-            <div class="k-stat-icon">👨‍🏫</div>
-            <div class="k-stat-val" id="kStatGuru">—</div>
-            <div class="k-stat-lbl">Total Guru</div>
-          </div>
-          <div class="k-stat-card">
-            <div class="k-stat-icon">📚</div>
-            <div class="k-stat-val" id="kStatMapel">—</div>
-            <div class="k-stat-lbl">Mata Pelajaran</div>
-          </div>
-          <div class="k-stat-card">
-            <div class="k-stat-icon">🏫</div>
-            <div class="k-stat-val" id="kStatKelas">—</div>
-            <div class="k-stat-lbl">Kelas Terdaftar</div>
-          </div>
-          <div class="k-stat-card">
-            <div class="k-stat-icon">✅</div>
-            <div class="k-stat-val" id="kStatAssigned">—</div>
-            <div class="k-stat-lbl">Guru Ditugaskan</div>
-          </div>
-        </div>
-        <!-- Quick actions -->
-        <div class="k-quick-title">Aksi Cepat</div>
-        <button class="k-quick-btn" onclick="Kurikulum.mobile.goPage('penugasan')">
-          <div class="k-quick-icon blue">📋</div>
-          <div>
-            <div class="k-quick-txt">Penugasan Guru</div>
-            <div class="k-quick-sub">Atur mapel &amp; kelas tiap guru</div>
-          </div>
-          <div class="k-quick-chevron">›</div>
-        </button>
-        <button class="k-quick-btn" onclick="Kurikulum.mobile.goPage('mapel')">
-          <div class="k-quick-icon purple">📚</div>
-          <div>
-            <div class="k-quick-txt">Kelola Mata Pelajaran</div>
-            <div class="k-quick-sub">Tambah, edit, hapus mapel</div>
-          </div>
-          <div class="k-quick-chevron">›</div>
-        </button>
+    <div style="padding-top:66px">
+      <div style="margin-bottom:14px">
+        <div style="font-size:18px;font-weight:800;color:var(--text)">Selamat datang 👋</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px" id="kHomeName">—</div>
       </div>
+      <div class="k-home-stats">
+        <div class="k-stat-card"><div class="k-stat-icon">👨‍🏫</div><div class="k-stat-val" id="kStatGuru">—</div><div class="k-stat-lbl">Total Guru</div></div>
+        <div class="k-stat-card"><div class="k-stat-icon">📚</div><div class="k-stat-val" id="kStatMapel">—</div><div class="k-stat-lbl">Mata Pelajaran</div></div>
+        <div class="k-stat-card"><div class="k-stat-icon">🏫</div><div class="k-stat-val" id="kStatKelas">—</div><div class="k-stat-lbl">Kelas Terdaftar</div></div>
+        <div class="k-stat-card"><div class="k-stat-icon">✅</div><div class="k-stat-val" id="kStatAssigned">—</div><div class="k-stat-lbl">Guru Ditugaskan</div></div>
+      </div>
+      <div class="k-quick-title">Aksi Cepat</div>
+      <button class="k-quick-btn" onclick="App.mobile.goPage('penugasan')">
+        <div class="k-quick-icon blue">📋</div>
+        <div><div class="k-quick-txt">Penugasan Guru</div><div class="k-quick-sub">Atur mapel &amp; kelas tiap guru</div></div>
+        <div class="k-quick-chevron">›</div>
+      </button>
+      <button class="k-quick-btn" onclick="App.mobile.goPage('mapel')">
+        <div class="k-quick-icon purple">📚</div>
+        <div><div class="k-quick-txt">Kelola Mata Pelajaran</div><div class="k-quick-sub">Tambah, edit, hapus mapel</div></div>
+        <div class="k-quick-chevron">›</div>
+      </button>
     </div>
   </div>
 
   <!-- PENUGASAN: DAFTAR GURU -->
   <div class="k-page" id="k-page-penugasan">
-    <div style="padding-top:52px; padding:66px 14px 0">
+    <div style="padding-top:66px">
       <div class="k-guru-list-header">
-        <div>
-          <div class="k-guru-list-title">Daftar Guru</div>
-        </div>
+        <div class="k-guru-list-title">Daftar Guru</div>
         <div class="k-guru-count" id="kGuruCountM">— guru</div>
       </div>
       <div class="k-guru-search-wrap">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input class="k-guru-search" id="kGuruSearchM" placeholder="Cari nama guru..." oninput="Kurikulum.mobile.filterGuru(this.value)" />
+        <input class="k-guru-search" id="kGuruSearchM" placeholder="Cari nama guru..." oninput="App.mobile.filterGuru(this.value)" />
       </div>
       <div id="kGuruListM">
         <div class="k-empty"><div class="k-empty-icon">⏳</div><div class="k-empty-sub">Memuat...</div></div>
@@ -848,34 +229,25 @@
 
   <!-- PENUGASAN: DETAIL GURU -->
   <div class="k-page" id="k-page-detail">
-    <div style="padding-top:52px; padding:66px 14px 0">
+    <div style="padding-top:66px">
       <div class="k-page-header">
-        <button class="k-page-back" onclick="Kurikulum.mobile.backToList()">←</button>
+        <button class="k-page-back" onclick="App.mobile.backToList()">←</button>
         <div>
           <div class="k-page-title" id="kDetailTitleM">—</div>
-          <div class="k-page-sub" id="kDetailSubM">—</div>
+          <div class="k-page-sub"   id="kDetailSubM">—</div>
         </div>
       </div>
-
-      <!-- Header kartu guru -->
-      <div class="k-detail-header" id="kDetailHeaderM">
+      <div class="k-detail-header">
         <div class="k-detail-av" id="kDetailAvM" style="background:#3b82f6">?</div>
         <div>
           <div class="k-detail-name" id="kDetailNameM">—</div>
-          <div class="k-detail-nip" id="kDetailNipM">—</div>
+          <div class="k-detail-nip"  id="kDetailNipM">—</div>
         </div>
         <div class="k-detail-stats">
-          <div class="k-detail-stat">
-            <div class="k-detail-stat-val" id="kDsMapel">0</div>
-            <div class="k-detail-stat-lbl">Mapel</div>
-          </div>
-          <div class="k-detail-stat">
-            <div class="k-detail-stat-val" id="kDsKelas">0</div>
-            <div class="k-detail-stat-lbl">Kelas</div>
-          </div>
+          <div class="k-detail-stat"><div class="k-detail-stat-val" id="kDsMapel">0</div><div class="k-detail-stat-lbl">Mapel</div></div>
+          <div class="k-detail-stat"><div class="k-detail-stat-val" id="kDsKelas">0</div><div class="k-detail-stat-lbl">Kelas</div></div>
         </div>
       </div>
-
       <!-- Step 1 -->
       <div class="k-step-card">
         <div class="k-step-head">
@@ -888,7 +260,6 @@
           </div>
         </div>
       </div>
-
       <!-- Step 2 -->
       <div class="k-step-card">
         <div class="k-step-head">
@@ -904,7 +275,7 @@
 
   <!-- KELOLA MAPEL -->
   <div class="k-page" id="k-page-mapel">
-    <div style="padding-top:52px; padding:66px 14px 0">
+    <div style="padding-top:66px">
       <div style="margin-bottom:14px">
         <div style="font-size:15px;font-weight:700;color:var(--text)">📚 Kelola Mata Pelajaran</div>
         <div style="font-size:12px;color:var(--text2);margin-top:2px">Tambah, edit, atau hapus daftar mata pelajaran</div>
@@ -912,7 +283,7 @@
       <div class="k-mapel-page">
         <div class="k-mapel-add-row">
           <input class="k-mapel-input" id="kNewMapelM" placeholder="Nama mata pelajaran baru..." />
-          <button class="btn btn-primary" onclick="Kurikulum.mapel.tambahM()">+ Tambah</button>
+          <button class="btn btn-primary" onclick="App.mapel.tambahM()">+ Tambah</button>
         </div>
         <div class="k-mapel-table" id="kMapelTableM">
           <div class="k-empty"><div class="k-empty-icon">⏳</div><div class="k-empty-sub">Memuat...</div></div>
@@ -921,9 +292,9 @@
     </div>
   </div>
 
-  <!-- PROFIL / KELUAR -->
+  <!-- PROFIL -->
   <div class="k-page" id="k-page-profil">
-    <div style="padding-top:52px; padding:66px 14px 0">
+    <div style="padding-top:66px">
       <div style="margin-bottom:18px">
         <div style="font-size:15px;font-weight:700;color:var(--text)">👤 Akun Saya</div>
       </div>
@@ -936,7 +307,7 @@
           </div>
         </div>
       </div>
-      <button onclick="Kurikulum.logout()" style="width:100%;padding:13px;border-radius:var(--radius);background:var(--error-bg);border:1px solid rgba(239,68,68,0.3);color:var(--error);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">
+      <button onclick="App.logout()" style="width:100%;padding:13px;border-radius:var(--radius);background:var(--error-bg);border:1px solid rgba(239,68,68,0.3);color:var(--error);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">
         🚪 Keluar dari Akun
       </button>
     </div>
@@ -948,33 +319,33 @@
 <div class="k-float-save" id="kFloatSave">
   <div class="k-float-save-txt">Ada <strong>perubahan belum disimpan</strong></div>
   <div style="display:flex;gap:6px">
-    <button class="btn btn-ghost btn-sm" onclick="Kurikulum.penugasan.cancel()">Batal</button>
-    <button class="btn btn-primary btn-sm" onclick="Kurikulum.penugasan.save()">💾 Simpan</button>
+    <button class="btn btn-ghost btn-sm"   onclick="App.penugasan.cancel()">Batal</button>
+    <button class="btn btn-primary btn-sm" onclick="App.penugasan.save()">💾 Simpan</button>
   </div>
 </div>
 
 <!-- BOTTOM NAV (mobile) -->
 <nav class="k-bottom-nav" id="kBottomNav">
-  <button class="k-bn-btn active" data-page="home" onclick="Kurikulum.mobile.goPage('home')">
+  <button class="k-bn-btn active" data-page="home" onclick="App.mobile.goPage('home')">
     <svg class="k-bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span class="k-bn-label">Beranda</span>
   </button>
-  <button class="k-bn-btn" data-page="penugasan" onclick="Kurikulum.mobile.goPage('penugasan')">
+  <button class="k-bn-btn" data-page="penugasan" onclick="App.mobile.goPage('penugasan')">
     <svg class="k-bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
     <span class="k-bn-label">Guru</span>
     <div class="k-bn-badge" id="kBnBadgePen"></div>
   </button>
-  <button class="k-bn-btn" data-page="mapel" onclick="Kurikulum.mobile.goPage('mapel')">
+  <button class="k-bn-btn" data-page="mapel" onclick="App.mobile.goPage('mapel')">
     <svg class="k-bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
     <span class="k-bn-label">Mapel</span>
   </button>
-  <button class="k-bn-btn" data-page="profil" onclick="Kurikulum.mobile.goPage('profil')">
+  <button class="k-bn-btn" data-page="profil" onclick="App.mobile.goPage('profil')">
     <svg class="k-bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span class="k-bn-label">Profil</span>
   </button>
 </nav>
 
-<!-- MODAL KONFIRMASI DAMPAK -->
+<!-- MODAL DAMPAK -->
 <div class="modal-overlay" id="modalDampak">
   <div class="modal" style="max-width:480px">
     <div class="modal-header">
@@ -987,7 +358,7 @@
       <div class="dampak-list" id="dampakList"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('modalDampak')">Batal</button>
+      <button class="btn btn-ghost"   onclick="closeModal('modalDampak')">Batal</button>
       <button class="btn btn-primary" id="dampakConfirmBtn">Ya, Lanjutkan</button>
     </div>
   </div>
@@ -1002,773 +373,35 @@
 </div>
 <div class="toast" id="toast"></div>
 
-<!-- SCRIPTS -->
+<!-- ═══════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════ -->
+<!-- Core -->
 <script src="js/core/config.js"></script>
 <script src="js/core/ui.js"></script>
 <script src="js/core/http.js"></script>
+
+<!-- Services -->
 <script src="js/services/api.js"></script>
 <script src="js/services/session.js"></script>
-<script src="js/utils/constants.js"></script>
+
+<!-- Modules kurikulum -->
+<script src="js/kurikulum/modules/penugasan.js"></script>
+<script src="js/kurikulum/modules/mapel.js"></script>
+<script src="js/kurikulum/modules/mobile.js"></script>
+
+<!-- Controller kurikulum -->
+<script src="js/kurikulum/controllers/KurikulumController.js"></script>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// CONSTANTS & STATE
-// ═══════════════════════════════════════════════════════
-const DOT_COLORS    = ['dot-blue','dot-green','dot-amber','dot-purple','dot-rose','dot-cyan','dot-orange','dot-teal','dot-indigo','dot-lime'];
-const AVATAR_COLORS = ['#3b82f6','#10b981','#f59e0b','#a78bfa','#f43f5e','#06b6d4','#f97316','#14b8a6','#6366f1','#84cc16'];
-
-// Dynamic kelas dari DB
-let kelasList  = [];   // ['7A','7B','8A',...] unique, sorted
-let tingkatMap = {};   // {'Kelas 7':['7A','7B',...], ...}
-
-let guruList    = [];
-let mapelList   = [];
-let currentGuru = null;
-let currentPen  = [];
-let penDirty    = false;
-let openAcc     = null;
-
-// ── Helpers ──────────────────────────────────────────
-function buildTingkatMap(list) {
-  // Urutan angka Romawi untuk sorting SMA
-  const ROMAWI_ORDER = { 'I':1,'II':2,'III':3,'IV':4,'V':5,'VI':6,
-                          'VII':7,'VIII':8,'IX':9,'X':10,'XI':11,'XII':12,'XIII':13 };
-
-  const map = {};
-  list.forEach(k => {
-    let tingkat;
-    // Format SMA: Romawi + strip, contoh: X-1, XI-2, XII-4
-    const sma = k.match(/^(X{0,3}(?:IX|IV|V?I{0,3}))-\d/i);
-    if (sma) {
-      tingkat = 'Kelas ' + sma[1].toUpperCase();
-    } else {
-      // Format SMP: angka di depan, contoh: 7A, 8B, 9C
-      const smp = k.match(/^(\d+)/);
-      tingkat = smp ? 'Kelas ' + smp[1] : 'Lainnya';
-    }
-    if (!map[tingkat]) map[tingkat] = [];
-    map[tingkat].push(k);
-  });
-
-  // Sort keys: SMP numerik dulu, lalu SMA urut Romawi, lalu Lainnya
-  const sorted = {};
-  Object.keys(map)
-    .sort((a, b) => {
-      const ka = a.replace('Kelas ','').trim();
-      const kb = b.replace('Kelas ','').trim();
-      const na = parseInt(ka) || ROMAWI_ORDER[ka.toUpperCase()] || 999;
-      const nb = parseInt(kb) || ROMAWI_ORDER[kb.toUpperCase()] || 999;
-      return na - nb;
-    })
-    .forEach(k => { sorted[k] = map[k].sort(); });
-  return sorted;
+function togglePassword(inputId, btn) {
+  const input    = document.getElementById(inputId);
+  const isHidden = input.type === 'password';
+  input.type     = isHidden ? 'text' : 'password';
+  btn.querySelector('.eye-open').style.display = isHidden ? 'none' : '';
+  input.focus();
 }
-
-function dotColor(mapelNama) {
-  const i = mapelList.findIndex(m => m.nama === mapelNama);
-  return DOT_COLORS[i % DOT_COLORS.length] || 'dot-blue';
-}
-function avatarColor(i) { return AVATAR_COLORS[i % AVATAR_COLORS.length]; }
-function initials(nama) { return nama.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
-function clonePen(guru) {
-  return (guru.penugasan || []).map(p => ({ mapel: p.mapel, kelas: [...(p.kelas||[])] }));
-}
-
-// ═══════════════════════════════════════════════════════
-// KURIKULUM APP
-// ═══════════════════════════════════════════════════════
-const Kurikulum = {
-
-  // ── LOGIN ──────────────────────────────────────────
-  async login() {
-    const username = UI.$('loginUser').value.trim();
-    const password = UI.$('loginPass').value;
-    if (!username || !password) {
-      UI.$('loginErr').textContent = 'Username dan password wajib diisi';
-      UI.$('loginErr').style.display = 'block'; return;
-    }
-    UI.showLoading('Masuk...');
-    try {
-      const res = await api.login(username, password);
-      if (res.status === 'ok' && res.role === 'kurikulum') {
-        sessionStorage.setItem('sinilai_kuri_session', JSON.stringify({ username, nama: res.nama || username }));
-        UI.hideLoading();
-        this._showApp(res.nama || username);
-      } else if (res.status === 'ok') {
-        UI.hideLoading();
-        UI.$('loginErr').textContent = 'Akun ini tidak memiliki akses kurikulum';
-        UI.$('loginErr').style.display = 'block';
-      } else {
-        UI.hideLoading();
-        UI.$('loginErr').textContent = res.message || 'Login gagal';
-        UI.$('loginErr').style.display = 'block';
-      }
-    } catch {
-      UI.hideLoading();
-      UI.$('loginErr').textContent = 'Gagal terhubung ke server';
-      UI.$('loginErr').style.display = 'block';
-    }
-  },
-
-  logout() {
-    if (!confirm('Keluar dari dashboard kurikulum?')) return;
-    sessionStorage.removeItem('sinilai_kuri_session');
-    location.reload();
-  },
-
-  _showApp(nama) {
-    UI.$('loginScreen').style.display = 'none';
-    const isMobile = window.innerWidth <= 768;
-    if (isMobile) {
-      UI.$('kMobileTopbar').style.display = 'flex';
-      UI.$('kBottomNav').style.display = 'flex';
-      UI.$('kMobilePages').style.display = 'block';
-      UI.$('kHomeName').textContent = nama;
-      UI.$('kProfilName').textContent = nama;
-      UI.$('kProfilAv').textContent = initials(nama);
-    } else {
-      UI.$('appScreen').style.display = '';
-      UI.$('mainArea').style.display = '';
-      UI.$('mainArea').style.marginLeft = 'var(--sidebar-w)';
-      UI.$('kuriName').textContent = nama;
-      document.body.classList.add('app-ready');
-    }
-    this.loadAll();
-  },
-
-  async loadAll() {
-    UI.showLoading('Memuat data...');
-    try {
-      const [resGuru, resMapel, resSiswa] = await Promise.all([
-        api.getGuru(),
-        api.getMapel(),
-        api.getSiswaAll(),
-      ]);
-
-      if (resGuru.status === 'ok')
-        guruList = (resGuru.guru || []).filter(g => g.role === 'guru' || !g.role);
-      if (resMapel.status === 'ok')
-        mapelList = resMapel.mapel || [];
-      if (resSiswa.status === 'ok') {
-        // Extract kelas unik dari data siswa, sort
-        kelasList = [...new Set(
-          (resSiswa.siswa || []).map(s => String(s.kelas || '').trim()).filter(Boolean)
-        )].sort((a, b) => {
-          // Sort numerik lalu alfabet
-          const na = parseInt(a) || 0, nb = parseInt(b) || 0;
-          if (na !== nb) return na - nb;
-          return a.localeCompare(b);
-        });
-        tingkatMap = buildTingkatMap(kelasList);
-      }
-
-      this.renderGuruList();
-      this.mobile.renderGuruList();
-      this.mobile.updateHomeStats();
-      this.mapel.renderM();
-    } catch {
-      UI.showToast('Gagal memuat data', 'error');
-    } finally {
-      UI.hideLoading();
-    }
-  },
-
-  showPage(page, btn) {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    btn.classList.add('active');
-    if (page === 'penugasan') {
-      UI.$('kuriListPanel').style.display = '';
-      UI.$('kuriDetail').style.marginLeft = '280px';
-      UI.$('kdTopbarPenugasan').style.display = '';
-      UI.$('kdTopbarMapel').style.display = 'none';
-      UI.$('pagePenugasan').style.display = '';
-      UI.$('pageMapel').classList.remove('active');
-      UI.$('savePenugasanBar').style.display = '';
-    } else {
-      UI.$('kuriListPanel').style.display = 'none';
-      UI.$('kuriDetail').style.marginLeft = '0';
-      UI.$('kdTopbarPenugasan').style.display = 'none';
-      UI.$('kdTopbarMapel').style.display = '';
-      UI.$('pagePenugasan').style.display = 'none';
-      UI.$('pageMapel').classList.add('active');
-      UI.$('savePenugasanBar').style.display = 'none';
-      this.mapel.render();
-    }
-  },
-
-  // ── DESKTOP GURU LIST ──────────────────────────────
-  renderGuruList(list = guruList) {
-    UI.$('guruCountBadge').textContent = `(${list.length})`;
-    UI.$('guruItems').innerHTML = list.length
-      ? list.map((g,i) => {
-          const totalKelas = new Set((g.penugasan||[]).flatMap(p=>p.kelas||[])).size;
-          const hasAny = (g.penugasan||[]).length > 0;
-          return `
-          <div class="guru-entry ${currentGuru?.username===g.username?'active':''}"
-               onclick="Kurikulum.selectGuru('${g.username}')">
-            <div class="ge-av" style="background:${avatarColor(i)}">${initials(g.nama)}</div>
-            <div>
-              <div class="ge-name">${g.nama}</div>
-              <div class="ge-sub">${hasAny?`${(g.penugasan||[]).length} mapel · ${totalKelas} kelas`:'Belum ditugaskan'}</div>
-            </div>
-            <div class="ge-dot ${hasAny?'ok':'empty'}"></div>
-          </div>`;
-        }).join('')
-      : '<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Tidak ada guru</div>';
-  },
-
-  filterGuru(q) {
-    const filtered = guruList.filter(g =>
-      g.nama.toLowerCase().includes(q.toLowerCase()) || (g.nip||'').includes(q));
-    this.renderGuruList(filtered);
-  },
-
-  selectGuru(username) {
-    if (penDirty && !confirm('Ada perubahan belum disimpan. Tinggalkan?')) return;
-    currentGuru = guruList.find(g => g.username === username);
-    if (!currentGuru) return;
-    currentPen = clonePen(currentGuru);
-    penDirty = false; openAcc = null;
-    UI.$('savePenugasanBar').classList.remove('show');
-    this.renderGuruList();
-    this.penugasan.render();
-  },
-
-  // ── PENUGASAN ──────────────────────────────────────
-  penugasan: {
-    render() {
-      if (!currentGuru) return;
-      UI.$('emptyState').style.display = 'none';
-      UI.$('guruDetail').style.display = '';
-      UI.$('kdTitle').textContent = currentGuru.nama;
-      UI.$('kdSub').textContent = 'NIP: ' + (currentGuru.nip || '—');
-      UI.$('detailStats').style.display = 'flex';
-      this.updateStats();
-      this.renderStep1();
-      this.renderStep2();
-    },
-    renderM() {
-      if (!currentGuru) return;
-      UI.$('kDetailTitleM').textContent = currentGuru.nama;
-      UI.$('kDetailSubM').textContent = 'NIP: ' + (currentGuru.nip || '—');
-      const idx = guruList.findIndex(g => g.username === currentGuru.username);
-      UI.$('kDetailAvM').textContent = initials(currentGuru.nama);
-      UI.$('kDetailAvM').style.background = avatarColor(idx);
-      UI.$('kDetailNameM').textContent = currentGuru.nama;
-      UI.$('kDetailNipM').textContent = 'NIP: ' + (currentGuru.nip || '—');
-      this.updateStatsM();
-      this.renderStep1M();
-      this.renderStep2M();
-    },
-    updateStats() {
-      UI.$('spMapel').textContent = currentPen.length;
-      UI.$('spKelas').textContent = new Set(currentPen.flatMap(p=>p.kelas)).size;
-    },
-    updateStatsM() {
-      UI.$('kDsMapel').textContent = currentPen.length;
-      UI.$('kDsKelas').textContent = new Set(currentPen.flatMap(p=>p.kelas)).size;
-    },
-
-    // Desktop step 1
-    renderStep1() {
-      UI.$('mapelChipGrid').innerHTML = mapelList.length
-        ? mapelList.map(m => {
-            const on = currentPen.some(p => p.mapel === m.nama);
-            return `<button class="mc ${on?'on':''}" onclick="Kurikulum.penugasan.toggleMapel('${m.nama}')">
-              <span class="mc-dot"></span>${m.nama}</button>`;
-          }).join('')
-        : '<div style="color:var(--text3);font-size:12px">Belum ada mata pelajaran.</div>';
-    },
-
-    // Mobile step 1
-    renderStep1M() {
-      UI.$('kMapelGridM').innerHTML = mapelList.length
-        ? mapelList.map(m => {
-            const on = currentPen.some(p => p.mapel === m.nama);
-            return `<button class="k-mc ${on?'on':''}" onclick="Kurikulum.penugasan.toggleMapelM('${m.nama}')">
-              <span class="k-mc-dot"></span>${m.nama}</button>`;
-          }).join('')
-        : '<div style="color:var(--text3);font-size:12px">Belum ada mata pelajaran.</div>';
-    },
-
-    // Desktop step 2
-    renderStep2() {
-      if (!currentPen.length) {
-        UI.$('step2Body').innerHTML = '<div class="empty-acc">Pilih mata pelajaran di Langkah 1 terlebih dahulu</div>';
-        return;
-      }
-      UI.$('step2Body').innerHTML = `<div class="acc-list">${currentPen.map((row,ri) => {
-        const dc = DOT_COLORS[mapelList.findIndex(m=>m.nama===row.mapel) % DOT_COLORS.length] || 'dot-blue';
-        return `
-        <div class="acc-item ${openAcc===row.mapel?'open':''}" id="acc-${ri}">
-          <div class="acc-head" onclick="Kurikulum.penugasan.toggleAcc('${row.mapel}')">
-            <div class="acc-mdot ${dc}"></div>
-            <div class="acc-mapel">${row.mapel}</div>
-            <span class="acc-kcount">${row.kelas.length} kelas</span>
-            <span class="acc-arrow">▼</span>
-            <button class="acc-del" onclick="event.stopPropagation();Kurikulum.penugasan.removeMapel(${ri})">✕</button>
-          </div>
-          <div class="acc-body">
-            ${Object.entries(tingkatMap).map(([t,klist]) => `
-            <div class="tingkat-sec">
-              <div class="tingkat-row">
-                <span class="tingkat-lbl">${t}</span>
-                <button class="tingkat-selall" onclick="Kurikulum.penugasan.selAllTingkat(${ri},'${t}')">Pilih semua</button>
-              </div>
-              <div class="kelas-chips">
-                ${klist.map(k=>`<button class="kchip ${row.kelas.includes(k)?'on':''}"
-                  onclick="Kurikulum.penugasan.toggleK(${ri},'${k}',this)">${k}</button>`).join('')}
-              </div>
-            </div>`).join('')}
-          </div>
-        </div>`;
-      }).join('')}</div>`;
-    },
-
-    // Mobile step 2
-    renderStep2M() {
-      if (!currentPen.length) {
-        UI.$('kStep2BodyM').innerHTML = '<div class="k-empty" style="padding:16px 0"><div class="k-empty-sub">Pilih mapel di Langkah 1</div></div>';
-        return;
-      }
-      UI.$('kStep2BodyM').innerHTML = `<div class="k-acc-list">${currentPen.map((row,ri) => {
-        const dc = DOT_COLORS[mapelList.findIndex(m=>m.nama===row.mapel) % DOT_COLORS.length] || 'dot-blue';
-        return `
-        <div class="k-acc-item ${openAcc===row.mapel?'open':''}" id="kacc-${ri}">
-          <div class="k-acc-head" onclick="Kurikulum.penugasan.toggleAccM('${row.mapel}')">
-            <div class="k-acc-mdot ${dc}"></div>
-            <div class="k-acc-mapel">${row.mapel}</div>
-            <span class="k-acc-kcount">${row.kelas.length} kelas</span>
-            <span class="k-acc-arrow">▼</span>
-            <button class="k-acc-del" onclick="event.stopPropagation();Kurikulum.penugasan.removeMapelM(${ri})">✕</button>
-          </div>
-          <div class="k-acc-body">
-            ${Object.entries(tingkatMap).map(([t,klist]) => `
-            <div class="k-tingkat-sec">
-              <div class="k-tingkat-row">
-                <span class="k-tingkat-lbl">${t}</span>
-                <button class="k-tingkat-selall" onclick="Kurikulum.penugasan.selAllTingkatM(${ri},'${t}')">Pilih semua</button>
-              </div>
-              <div class="k-kelas-chips">
-                ${klist.map(k=>`<button class="k-kchip ${row.kelas.includes(k)?'on':''}"
-                  onclick="Kurikulum.penugasan.toggleKM(${ri},'${k}',this)">${k}</button>`).join('')}
-              </div>
-            </div>`).join('')}
-          </div>
-        </div>`;
-      }).join('')}</div>`;
-    },
-
-    toggleMapel(nama) {
-      const i = currentPen.findIndex(p => p.mapel === nama);
-      if (i >= 0) { currentPen.splice(i,1); if(openAcc===nama) openAcc=null; }
-      else { currentPen.push({ mapel: nama, kelas: [] }); openAcc = nama; }
-      this.markDirty(); this.render();
-    },
-    toggleMapelM(nama) {
-      const i = currentPen.findIndex(p => p.mapel === nama);
-      if (i >= 0) { currentPen.splice(i,1); if(openAcc===nama) openAcc=null; }
-      else { currentPen.push({ mapel: nama, kelas: [] }); openAcc = nama; }
-      this.markDirty(); this.renderM();
-    },
-
-    toggleAcc(mapel) { openAcc = openAcc===mapel ? null : mapel; this.renderStep2(); },
-    toggleAccM(mapel) { openAcc = openAcc===mapel ? null : mapel; this.renderStep2M(); },
-
-    toggleK(ri, k, btn) {
-      const row = currentPen[ri];
-      const i = row.kelas.indexOf(k);
-      if (i >= 0) row.kelas.splice(i,1); else row.kelas.push(k);
-      btn.classList.toggle('on');
-      this.markDirty(); this.updateStats();
-      const el = document.querySelector(`#acc-${ri} .acc-kcount`);
-      if (el) el.textContent = row.kelas.length + ' kelas';
-    },
-    toggleKM(ri, k, btn) {
-      const row = currentPen[ri];
-      const i = row.kelas.indexOf(k);
-      if (i >= 0) row.kelas.splice(i,1); else row.kelas.push(k);
-      btn.classList.toggle('on');
-      this.markDirty(); this.updateStatsM();
-      const el = document.querySelector(`#kacc-${ri} .k-acc-kcount`);
-      if (el) el.textContent = row.kelas.length + ' kelas';
-    },
-
-    selAllTingkat(ri, tingkat) {
-      const klist = tingkatMap[tingkat] || [];
-      const row = currentPen[ri];
-      const allOn = klist.every(k => row.kelas.includes(k));
-      if (allOn) row.kelas = row.kelas.filter(k => !klist.includes(k));
-      else klist.forEach(k => { if (!row.kelas.includes(k)) row.kelas.push(k); });
-      this.markDirty(); this.renderStep2(); this.updateStats();
-    },
-    selAllTingkatM(ri, tingkat) {
-      const klist = tingkatMap[tingkat] || [];
-      const row = currentPen[ri];
-      const allOn = klist.every(k => row.kelas.includes(k));
-      if (allOn) row.kelas = row.kelas.filter(k => !klist.includes(k));
-      else klist.forEach(k => { if (!row.kelas.includes(k)) row.kelas.push(k); });
-      this.markDirty(); this.renderStep2M(); this.updateStatsM();
-    },
-
-    removeMapel(ri) { currentPen.splice(ri,1); this.markDirty(); this.render(); },
-    removeMapelM(ri) { currentPen.splice(ri,1); this.markDirty(); this.renderM(); },
-
-    markDirty() {
-      penDirty = true;
-      UI.$('savePenugasanBar').classList.add('show');
-      UI.$('kFloatSave').classList.add('show');
-      UI.$('kTopbarSaveBtn').classList.add('show');
-      UI.$('kBnBadgePen').classList.add('show');
-    },
-    markClean() {
-      penDirty = false;
-      UI.$('savePenugasanBar').classList.remove('show');
-      UI.$('kFloatSave').classList.remove('show');
-      UI.$('kTopbarSaveBtn').classList.remove('show');
-      UI.$('kBnBadgePen').classList.remove('show');
-    },
-
-    cancel() {
-      currentPen = clonePen(currentGuru);
-      openAcc = null;
-      this.markClean();
-      this.render();
-      this.renderM();
-    },
-
-    async save() {
-      if (!currentGuru) return;
-      UI.showLoading('Menyimpan penugasan...');
-      try {
-        const res = await api.savePenugasan({ username: currentGuru.username, penugasan: currentPen });
-        if (res.status === 'ok') {
-          currentGuru.penugasan = currentPen.map(p => ({ mapel: p.mapel, kelas: [...p.kelas] }));
-          const idx = guruList.findIndex(g => g.username === currentGuru.username);
-          if (idx >= 0) guruList[idx] = { ...currentGuru };
-          this.markClean();
-          Kurikulum.renderGuruList();
-          Kurikulum.mobile.renderGuruList();
-          Kurikulum.mobile.updateHomeStats();
-          UI.showToast('✓ Penugasan berhasil disimpan', 'success');
-        } else {
-          UI.showToast('Gagal: ' + (res.message || 'Error'), 'error');
-        }
-      } catch {
-        UI.showToast('Gagal terhubung ke server', 'error');
-      } finally {
-        UI.hideLoading();
-      }
-    },
-  },
-
-  // ── KELOLA MAPEL ──────────────────────────────────
-  mapel: {
-    // Desktop
-    render() {
-      UI.$('mapelTableWrap').innerHTML = mapelList.length
-        ? mapelList.map((m, i) => {
-            const usage = guruList.filter(g => (g.penugasan||[]).some(p => p.mapel === m.nama)).length;
-            return `
-            <div class="mapel-row-item" id="mr-${i}">
-              <div class="mr-dot ${DOT_COLORS[i % DOT_COLORS.length]}"></div>
-              <div class="mr-name" id="mrName-${i}">${m.nama}</div>
-              <input class="mr-edit-input" id="mrInput-${i}" value="${m.nama}" />
-              <span class="mr-usage">${usage} guru</span>
-              <div class="mr-actions">
-                <button class="btn btn-ghost btn-sm" id="mrEditBtn-${i}" onclick="Kurikulum.mapel.startEdit(${i})">Edit</button>
-                <button class="btn btn-primary btn-sm" id="mrSaveBtn-${i}" style="display:none" onclick="Kurikulum.mapel.confirmEdit(${i})">Simpan</button>
-                <button class="btn btn-ghost btn-sm" id="mrCancelBtn-${i}" style="display:none" onclick="Kurikulum.mapel.cancelEdit(${i})">Batal</button>
-                <button class="btn btn-danger btn-sm" onclick="Kurikulum.mapel.confirmHapus(${i})">Hapus</button>
-              </div>
-            </div>`;
-          }).join('')
-        : '<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">Belum ada mata pelajaran</div>';
-    },
-
-    // Mobile
-    renderM() {
-      const el = UI.$('kMapelTableM');
-      if (!el) return;
-      el.innerHTML = mapelList.length
-        ? mapelList.map((m, i) => {
-            const usage = guruList.filter(g => (g.penugasan||[]).some(p => p.mapel === m.nama)).length;
-            return `
-            <div class="k-mapel-row" id="kmr-${i}">
-              <div class="k-mapel-dot ${DOT_COLORS[i % DOT_COLORS.length]}"></div>
-              <div class="k-mapel-name" id="kmrName-${i}">${m.nama}</div>
-              <input class="k-mapel-edit-input" id="kmrInput-${i}" value="${m.nama}" />
-              <span class="k-mapel-usage">${usage} guru</span>
-              <div class="k-mapel-btns">
-                <button class="btn btn-ghost btn-sm" id="kmrEditBtn-${i}" onclick="Kurikulum.mapel.startEditM(${i})">Edit</button>
-                <button class="btn btn-primary btn-sm" id="kmrSaveBtn-${i}" style="display:none" onclick="Kurikulum.mapel.confirmEditM(${i})">✓</button>
-                <button class="btn btn-ghost btn-sm" id="kmrCancelBtn-${i}" style="display:none" onclick="Kurikulum.mapel.cancelEditM(${i})">✕</button>
-                <button class="btn btn-danger btn-sm" onclick="Kurikulum.mapel.confirmHapus(${i})">🗑</button>
-              </div>
-            </div>`;
-          }).join('')
-        : '<div class="k-empty" style="padding:28px 0"><div class="k-empty-icon">📚</div><div class="k-empty-sub">Belum ada mata pelajaran</div></div>';
-    },
-
-    startEdit(i) {
-      UI.$('mrName-'+i).style.display='none'; UI.$('mrInput-'+i).classList.add('show');
-      UI.$('mrEditBtn-'+i).style.display='none'; UI.$('mrSaveBtn-'+i).style.display='';
-      UI.$('mrCancelBtn-'+i).style.display=''; UI.$('mrInput-'+i).focus();
-    },
-    cancelEdit(i) {
-      UI.$('mrInput-'+i).value = mapelList[i].nama;
-      UI.$('mrName-'+i).style.display=''; UI.$('mrInput-'+i).classList.remove('show');
-      UI.$('mrEditBtn-'+i).style.display=''; UI.$('mrSaveBtn-'+i).style.display='none';
-      UI.$('mrCancelBtn-'+i).style.display='none';
-    },
-    confirmEdit(i) { this._doConfirmEdit(i, UI.$('mrInput-'+i).value.trim(), false); },
-
-    startEditM(i) {
-      UI.$('kmrName-'+i).style.display='none'; UI.$('kmrInput-'+i).classList.add('show');
-      UI.$('kmrEditBtn-'+i).style.display='none'; UI.$('kmrSaveBtn-'+i).style.display='';
-      UI.$('kmrCancelBtn-'+i).style.display=''; UI.$('kmrInput-'+i).focus();
-    },
-    cancelEditM(i) {
-      UI.$('kmrInput-'+i).value = mapelList[i].nama;
-      UI.$('kmrName-'+i).style.display=''; UI.$('kmrInput-'+i).classList.remove('show');
-      UI.$('kmrEditBtn-'+i).style.display=''; UI.$('kmrSaveBtn-'+i).style.display='none';
-      UI.$('kmrCancelBtn-'+i).style.display='none';
-    },
-    confirmEditM(i) { this._doConfirmEdit(i, UI.$('kmrInput-'+i).value.trim(), true); },
-
-    _doConfirmEdit(i, namaBaru, isMobile) {
-      const namaLama = mapelList[i].nama;
-      if (!namaBaru) { UI.showToast('Nama mapel tidak boleh kosong', 'error'); return; }
-      if (namaBaru === namaLama) { isMobile ? this.cancelEditM(i) : this.cancelEdit(i); return; }
-      if (mapelList.some((m,j) => j!==i && m.nama.toLowerCase()===namaBaru.toLowerCase())) {
-        UI.showToast('Nama mapel sudah ada', 'error'); return;
-      }
-      const terdampak = guruList.filter(g => (g.penugasan||[]).some(p => p.mapel === namaLama));
-      if (terdampak.length) {
-        this._showDampakModal(
-          `Nama mapel "${namaLama}" → "${namaBaru}"`,
-          `Penugasan ${terdampak.length} guru berikut akan diperbarui otomatis:`,
-          terdampak, () => this._doEdit(i, namaLama, namaBaru)
-        );
-      } else {
-        this._doEdit(i, namaLama, namaBaru);
-      }
-    },
-
-    async _doEdit(i, namaLama, namaBaru) {
-      UI.showLoading('Memperbarui mata pelajaran...');
-      try {
-        const res = await api.editMapel({ namaLama, namaBaru });
-        if (res.status === 'ok') {
-          mapelList[i].nama = namaBaru;
-          guruList.forEach(g => { (g.penugasan||[]).forEach(p => { if(p.mapel===namaLama) p.mapel=namaBaru; }); });
-          if (currentGuru) {
-            currentPen.forEach(p => { if(p.mapel===namaLama) p.mapel=namaBaru; });
-            Kurikulum.penugasan.render(); Kurikulum.penugasan.renderM();
-          }
-          this.render(); this.renderM();
-          Kurikulum.renderGuruList(); Kurikulum.mobile.renderGuruList();
-          UI.showToast(`✓ Mapel berhasil diubah menjadi "${namaBaru}"`, 'success');
-        } else { UI.showToast('Gagal: ' + (res.message||'Error'), 'error'); }
-      } catch { UI.showToast('Gagal terhubung ke server', 'error'); }
-      finally { UI.hideLoading(); }
-    },
-
-    confirmHapus(i) {
-      const nama = mapelList[i].nama;
-      const terdampak = guruList.filter(g => (g.penugasan||[]).some(p => p.mapel === nama));
-      if (terdampak.length) {
-        this._showDampakModal(
-          `Hapus mata pelajaran "${nama}"?`,
-          `⚠️ Penugasan "${nama}" akan dihapus dari ${terdampak.length} guru berikut:`,
-          terdampak, () => this._doHapus(i, nama)
-        );
-      } else {
-        if (!confirm(`Hapus mata pelajaran "${nama}"?`)) return;
-        this._doHapus(i, nama);
-      }
-    },
-
-    async _doHapus(i, nama) {
-      UI.showLoading('Menghapus mata pelajaran...');
-      try {
-        const res = await api.deleteMapel({ nama });
-        if (res.status === 'ok') {
-          mapelList.splice(i, 1);
-          guruList.forEach(g => { if(g.penugasan) g.penugasan = g.penugasan.filter(p=>p.mapel!==nama); });
-          if (currentGuru) {
-            currentPen = currentPen.filter(p => p.mapel !== nama);
-            Kurikulum.penugasan.render(); Kurikulum.penugasan.renderM();
-          }
-          this.render(); this.renderM();
-          Kurikulum.renderGuruList(); Kurikulum.mobile.renderGuruList();
-          Kurikulum.mobile.updateHomeStats();
-          UI.showToast(`✓ Mapel "${nama}" berhasil dihapus`, 'success');
-        } else { UI.showToast('Gagal: ' + (res.message||'Error'), 'error'); }
-      } catch { UI.showToast('Gagal terhubung ke server', 'error'); }
-      finally { UI.hideLoading(); }
-    },
-
-    async tambah() {
-      const nama = UI.$('newMapelInput').value.trim();
-      if (!nama) { UI.showToast('Nama mapel tidak boleh kosong', 'error'); return; }
-      if (mapelList.some(m => m.nama.toLowerCase()===nama.toLowerCase())) {
-        UI.showToast('Nama mapel sudah ada', 'error'); return;
-      }
-      UI.showLoading('Menambahkan...');
-      try {
-        const res = await api.addMapel({ nama });
-        if (res.status === 'ok') {
-          mapelList.push({ id: res.id || Date.now(), nama });
-          UI.$('newMapelInput').value = '';
-          this.render(); this.renderM();
-          Kurikulum.mobile.updateHomeStats();
-          UI.showToast(`✓ Mapel "${nama}" berhasil ditambahkan`, 'success');
-        } else { UI.showToast('Gagal: ' + (res.message||'Error'), 'error'); }
-      } catch { UI.showToast('Gagal terhubung ke server', 'error'); }
-      finally { UI.hideLoading(); }
-    },
-
-    async tambahM() {
-      const nama = UI.$('kNewMapelM').value.trim();
-      if (!nama) { UI.showToast('Nama mapel tidak boleh kosong', 'error'); return; }
-      if (mapelList.some(m => m.nama.toLowerCase()===nama.toLowerCase())) {
-        UI.showToast('Nama mapel sudah ada', 'error'); return;
-      }
-      UI.showLoading('Menambahkan...');
-      try {
-        const res = await api.addMapel({ nama });
-        if (res.status === 'ok') {
-          mapelList.push({ id: res.id || Date.now(), nama });
-          UI.$('kNewMapelM').value = '';
-          this.render(); this.renderM();
-          Kurikulum.mobile.updateHomeStats();
-          UI.showToast(`✓ Mapel "${nama}" berhasil ditambahkan`, 'success');
-        } else { UI.showToast('Gagal: ' + (res.message||'Error'), 'error'); }
-      } catch { UI.showToast('Gagal terhubung ke server', 'error'); }
-      finally { UI.hideLoading(); }
-    },
-
-    _showDampakModal(title, warning, terdampak, onConfirm) {
-      UI.$('dampakTitle').textContent = title;
-      UI.$('dampakWarning').textContent = warning;
-      UI.$('dampakList').innerHTML = terdampak.map((g,i) => `
-        <div class="dampak-item">
-          <div class="dampak-av" style="background:${avatarColor(i)}">${initials(g.nama)}</div>
-          <div><div class="dampak-name">${g.nama}</div></div>
-        </div>`).join('');
-      openModal('modalDampak');
-      UI.$('dampakConfirmBtn').onclick = () => { closeModal('modalDampak'); onConfirm(); };
-    },
-  },
-
-  // ── MOBILE ─────────────────────────────────────────
-  mobile: {
-    currentPage: 'home',
-
-    goPage(page) {
-      // Update bottom nav
-      document.querySelectorAll('.k-bn-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.page === page);
-      });
-
-      // Show correct page
-      const pageMap = { home:'k-page-home', penugasan:'k-page-penugasan', mapel:'k-page-mapel', profil:'k-page-profil' };
-      document.querySelectorAll('.k-page').forEach(p => p.classList.remove('active'));
-      const target = UI.$(pageMap[page]);
-      if (target) target.classList.add('active');
-
-      // Render mapel list when navigating to mapel page
-      if (page === 'mapel') Kurikulum.mapel.renderM();
-
-      this.currentPage = page;
-    },
-
-    backToList() {
-      if (penDirty && !confirm('Ada perubahan belum disimpan. Tinggalkan?')) return;
-      currentGuru = null;
-      currentPen = []; penDirty = false; openAcc = null;
-      Kurikulum.penugasan.markClean();
-      this.goPage('penugasan');
-    },
-
-    selectGuru(username) {
-      if (penDirty && !confirm('Ada perubahan belum disimpan. Tinggalkan?')) return;
-      currentGuru = guruList.find(g => g.username === username);
-      if (!currentGuru) return;
-      currentPen = clonePen(currentGuru);
-      penDirty = false; openAcc = null;
-      Kurikulum.penugasan.markClean();
-
-      // Switch to detail page
-      document.querySelectorAll('.k-page').forEach(p => p.classList.remove('active'));
-      UI.$('k-page-detail').classList.add('active');
-
-      Kurikulum.penugasan.renderM();
-    },
-
-    renderGuruList(list = guruList) {
-      const el = UI.$('kGuruListM');
-      const countEl = UI.$('kGuruCountM');
-      if (!el) return;
-      if (countEl) countEl.textContent = list.length + ' guru';
-      el.innerHTML = list.length
-        ? list.map((g,i) => {
-            const totalKelas = new Set((g.penugasan||[]).flatMap(p=>p.kelas||[])).size;
-            const hasAny = (g.penugasan||[]).length > 0;
-            return `
-            <button class="k-guru-card" onclick="Kurikulum.mobile.selectGuru('${g.username}')">
-              <div class="k-guru-av" style="background:${avatarColor(i)}">${initials(g.nama)}</div>
-              <div style="flex:1;text-align:left">
-                <div class="k-guru-av-name">${g.nama}</div>
-                <div class="k-guru-av-sub">${hasAny?`${(g.penugasan||[]).length} mapel · ${totalKelas} kelas`:'Belum ditugaskan'}</div>
-              </div>
-              <div class="k-guru-status">
-                <div class="k-guru-dot ${hasAny?'ok':'empty'}"></div>
-                <div class="k-guru-chevron">›</div>
-              </div>
-            </button>`;
-          }).join('')
-        : '<div class="k-empty"><div class="k-empty-icon">👨‍🏫</div><div class="k-empty-sub">Tidak ada guru ditemukan</div></div>';
-    },
-
-    filterGuru(q) {
-      const filtered = guruList.filter(g =>
-        g.nama.toLowerCase().includes(q.toLowerCase()) || (g.nip||'').includes(q));
-      this.renderGuruList(filtered);
-    },
-
-    updateHomeStats() {
-      const assigned = guruList.filter(g => (g.penugasan||[]).length > 0).length;
-      UI.$('kStatGuru').textContent   = guruList.length;
-      UI.$('kStatMapel').textContent  = mapelList.length;
-      UI.$('kStatKelas').textContent  = kelasList.length;
-      UI.$('kStatAssigned').textContent = assigned;
-    },
-  },
-};
-
-// ── HELPERS ──────────────────────────────────────────
-function openModal(id)  { UI.$(id)?.classList.add('show'); }
-function closeModal(id) { UI.$(id)?.classList.remove('show'); }
-function togglePassword(id, btn) {
-  const input = UI.$(id);
-  const isText = input.type === 'text';
-  input.type = isText ? 'password' : 'text';
-  btn.querySelector('.eye-open').style.display = isText ? '' : 'none';
-}
-
-// ── INIT ─────────────────────────────────────────────
-(function init() {
-  const sess = sessionStorage.getItem('sinilai_kuri_session');
-  if (sess) {
-    try {
-      const { nama } = JSON.parse(sess);
-      Kurikulum._showApp(nama);
-    } catch { sessionStorage.removeItem('sinilai_kuri_session'); }
-  }
-  UI.bindEnterKey(['loginUser','loginPass'], () => Kurikulum.login());
-})();
 </script>
+
 </body>
 </html>
