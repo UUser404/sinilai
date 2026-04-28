@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SiNilai — Akses Ditolak</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #0f1117;
+    --surface: #1a1d27;
+    --border:  #2a2d3a;
+    --text:    #e8eaf0;
+    --text2:   #8b8fa8;
+    --text3:   #555870;
+    --primary: #3b82f6;
+    --primary-light: rgba(59,130,246,0.12);
+    --error:   #ef4444;
+    --error-bg: rgba(239,68,68,0.1);
+    --accent:  #f59e0b;
+    --accent-light: rgba(245,158,11,0.1);
+    --success: #10b981;
+    --success-bg: rgba(16,185,129,0.1);
+    --radius:  12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 40px 36px;
+    max-width: 440px; width: 100%; text-align: center;
+    animation: fadeUp 0.4s ease;
+  }
+
+  .brand {
+    font-size: 20px; font-weight: 800; margin-bottom: 28px;
+    color: var(--text);
+  }
+  .brand span { color: var(--primary); }
+  .brand small {
+    display: block; font-size: 11px; font-weight: 500;
+    color: var(--text3); letter-spacing: 1.5px;
+    text-transform: uppercase; margin-top: 2px;
+  }
+
+  .icon-wrap {
+    width: 72px; height: 72px; border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; margin: 0 auto 20px;
+  }
+  .icon-wrap.red    { background: var(--error-bg);   border: 1px solid rgba(239,68,68,0.2); }
+  .icon-wrap.amber  { background: var(--accent-light); border: 1px solid rgba(245,158,11,0.2); }
+  .icon-wrap.blue   { background: var(--primary-light); border: 1px solid rgba(59,130,246,0.2); }
+
+  .title {
+    font-size: 20px; font-weight: 800; margin-bottom: 10px; color: var(--text);
+  }
+  .desc {
+    font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 28px;
+  }
+  .desc strong { color: var(--text); font-weight: 600; }
+
+  .info-box {
+    padding: 12px 16px; border-radius: var(--radius-sm);
+    font-size: 12px; text-align: left; margin-bottom: 24px; line-height: 1.6;
+  }
+  .info-box.amber { background: var(--accent-light); border: 1px solid rgba(245,158,11,0.2); color: var(--accent); }
+  .info-box.red   { background: var(--error-bg);     border: 1px solid rgba(239,68,68,0.2);  color: var(--error);  }
+  .info-box.blue  { background: var(--primary-light); border: 1px solid rgba(59,130,246,0.2); color: var(--primary); }
+
+  .btn {
+    display: block; width: 100%; padding: 12px 20px;
+    border-radius: var(--radius-sm); font-family: inherit;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    border: none; transition: all 0.15s; text-decoration: none;
+    margin-bottom: 10px; text-align: center;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: #2563eb; }
+  .btn-ghost {
+    background: transparent; color: var(--text2);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface); color: var(--text); border-color: var(--text3); }
+
+  .divider {
+    height: 1px; background: var(--border); margin: 20px 0;
+  }
+
+  .role-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .role-pill.guru     { background: var(--success-bg); color: var(--success); }
+  .role-pill.admin    { background: var(--primary-light); color: var(--primary); }
+  .role-pill.kurikulum { background: var(--accent-light); color: var(--accent); }
+
+  .session-info {
+    font-size: 12px; color: var(--text3); margin-top: 16px;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 28px 20px; }
+    .title { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">Si<span>Nilai</span><small>Sistem Informasi Nilai</small></div>
+
+  <!-- Konten dinamis diisi oleh JS -->
+  <div id="content"></div>
+
+  <div class="divider"></div>
+  <div class="session-info" id="sessionInfo"></div>
+</div>
+
+<script>
+// ── Baca session dari semua role ────────────────────────────────────────────
+function getSession() {
+  try {
+    const guru = sessionStorage.getItem('sinilai_guru:session');
+    if (guru) return { role: 'guru', data: JSON.parse(guru) };
+  } catch {}
+  try {
+    const admin = sessionStorage.getItem('sinilai_admin:session');
+    if (admin) return { role: 'admin', data: JSON.parse(admin) };
+  } catch {}
+  try {
+    const kuri = sessionStorage.getItem('sinilai_kuri_session');
+    if (kuri) return { role: 'kurikulum', data: JSON.parse(kuri) };
+  } catch {}
+  return null;
+}
+
+function homeByRole(role) {
+  if (role === 'admin')     return 'admin.html';
+  if (role === 'kurikulum') return 'kurikulum.html';
+  return 'index.html';
+}
+
+function rolePill(role) {
+  const label = role === 'guru' ? 'Guru' : role === 'admin' ? 'Admin' : 'Kurikulum';
+  return `<span class="role-pill ${role}">${label}</span>`;
+}
+
+// ── Ambil reason dari URL param ──────────────────────────────────────────────
+const params  = new URLSearchParams(window.location.search);
+const reason  = params.get('reason') || 'unknown';
+const from    = params.get('from')   || '';
+const session = getSession();
+
+// ── Render konten sesuai kondisi ─────────────────────────────────────────────
+const content     = document.getElementById('content');
+const sessionInfo = document.getElementById('sessionInfo');
+
+if (reason === 'notfound') {
+  // Halaman tidak ditemukan
+  content.innerHTML = `
+    <div class="icon-wrap blue">🔍</div>
+    <div class="title">Halaman Tidak Ditemukan</div>
+    <div class="desc">
+      Halaman <strong>${from || 'yang kamu akses'}</strong> tidak tersedia
+      atau alamatnya salah.
+    </div>
+    <div class="info-box blue">
+      Pastikan URL yang kamu masukkan sudah benar. Halaman yang tersedia:
+      index.html, admin.html, dan kurikulum.html.
+    </div>
+    ${session
+      ? `<a class="btn btn-primary" href="${homeByRole(session.role)}">🏠 Ke Halaman Saya</a>`
+      : `<a class="btn btn-primary" href="index.html">🏠 Ke Halaman Login</a>`
+    }`;
+
+} else if (reason === 'role') {
+  // Sudah login tapi role salah halaman
+  const nama = session?.data?.nama || session?.data?.user || 'Kamu';
+  content.innerHTML = `
+    <div class="icon-wrap amber">🚫</div>
+    <div class="title">Akses Tidak Diizinkan</div>
+    <div class="desc">
+      Halo, <strong>${nama}</strong>. Kamu tidak memiliki izin untuk
+      mengakses halaman <strong>${from || 'ini'}</strong>.
+    </div>
+    <div class="info-box amber">
+      Akun kamu terdaftar sebagai ${rolePill(session?.role || 'guru')}.
+      Setiap role hanya bisa mengakses halaman yang sesuai.
+    </div>
+    <a class="btn btn-primary" href="${homeByRole(session?.role)}">
+      ↩ Kembali ke Halaman Saya
+    </a>
+    <button class="btn btn-ghost" onclick="logout()">🚪 Logout &amp; Ganti Akun</button>`;
+
+} else if (reason === 'auth') {
+  // Belum login sama sekali
+  content.innerHTML = `
+    <div class="icon-wrap red">🔒</div>
+    <div class="title">Belum Login</div>
+    <div class="desc">
+      Kamu harus login terlebih dahulu untuk mengakses
+      halaman <strong>${from || 'ini'}</strong>.
+    </div>
+    <div class="info-box red">
+      Sesi kamu mungkin sudah berakhir atau kamu belum pernah login.
+      Silakan login ulang untuk melanjutkan.
+    </div>
+    <a class="btn btn-primary" href="index.html">🔑 Login Sekarang</a>`;
+
+} else {
+  // Fallback - kondisi tidak dikenal
+  content.innerHTML = `
+    <div class="icon-wrap red">⚠️</div>
+    <div class="title">Terjadi Kesalahan</div>
+    <div class="desc">
+      Terjadi kesalahan yang tidak diketahui. Silakan kembali ke halaman utama.
+    </div>
+    <a class="btn btn-primary" href="index.html">🏠 Ke Halaman Utama</a>`;
+}
+
+// ── Session info di bawah ────────────────────────────────────────────────────
+if (session) {
+  const nama = session.data?.nama || session.data?.user || '—';
+  sessionInfo.innerHTML = `Login sebagai: <strong style="color:var(--text)">${nama}</strong> ${rolePill(session.role)}`;
+} else {
+  sessionInfo.innerHTML = 'Tidak ada sesi aktif';
+}
+
+// ── Logout helper ────────────────────────────────────────────────────────────
+function logout() {
+  ['sinilai_guru:session','sinilai_admin:session','sinilai_kuri_session'].forEach(k => {
+    sessionStorage.removeItem(k);
+  });
+  window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>
