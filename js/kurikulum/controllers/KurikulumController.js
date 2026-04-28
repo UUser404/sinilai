@@ -112,7 +112,6 @@ class KurikulumController {
 
     if (page === 'penugasan') {
       UI.$('kuriListPanel').style.display    = '';
-      UI.$('kuriDetail').style.marginLeft    = '280px';
       UI.$('kdTopbarPenugasan').style.display = '';
       UI.$('kdTopbarMapel').style.display    = 'none';
       UI.$('pagePenugasan').style.display    = '';
@@ -120,7 +119,6 @@ class KurikulumController {
       UI.$('savePenugasanBar').style.display = '';
     } else {
       UI.$('kuriListPanel').style.display    = 'none';
-      UI.$('kuriDetail').style.marginLeft    = '0';
       UI.$('kdTopbarPenugasan').style.display = 'none';
       UI.$('kdTopbarMapel').style.display    = '';
       UI.$('pagePenugasan').style.display    = 'none';
