@@ -238,10 +238,9 @@ class KurikulumController {
       UI.$('kProfilName').textContent     = nama;
       UI.$('kProfilAv').textContent       = initials(nama);
     } else {
-      UI.$('appScreen').style.display   = '';
-      UI.$('mainArea').style.display    = '';
-      UI.$('mainArea').style.marginLeft = 'var(--sidebar-w)';
-      UI.$('kuriName').textContent      = nama;
+      UI.$('appScreen').style.display = '';
+      UI.$('mainArea').style.display  = '';
+      UI.$('kuriName').textContent    = nama;
       document.body.classList.add('app-ready');
     }
     this.loadAll();

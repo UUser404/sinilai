@@ -9,13 +9,11 @@
 ══════════════════════════════════════════════ */
 .kuri-layout {
   display: flex; height: 100vh; overflow: hidden;
-  margin-left: var(--sidebar-w);
 }
 .kuri-list {
   width: 280px; flex-shrink: 0;
   background: var(--surface); border-right: 1px solid var(--border);
   display: flex; flex-direction: column; height: 100vh; overflow: hidden;
-  position: fixed; top: 0; left: var(--sidebar-w); z-index: 40;
 }
 .kuri-list-top {
   padding: 14px 14px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0;
@@ -194,8 +192,8 @@
 .sb-txt strong { color: var(--accent); }
 
 /* KELOLA MAPEL */
-.mapel-manage-page { padding: 22px; display: none; height: 100%; overflow-y: auto; }
-.mapel-manage-page.active { display: block; }
+.mapel-manage-page { padding: 22px; display: none; flex: 1; overflow-y: auto; }
+.mapel-manage-page.active { display: flex; flex-direction: column; }
 .mapel-add-row { display: flex; gap: 8px; margin-bottom: 18px; align-items: center; }
 .mapel-add-input {
   flex: 1; padding: 9px 12px; background: var(--surface2);
