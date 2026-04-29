@@ -192,8 +192,8 @@
 .sb-txt strong { color: var(--accent); }
 
 /* KELOLA MAPEL */
-.mapel-manage-page { padding: 22px; display: none; flex: 1; overflow-y: auto; }
-.mapel-manage-page.active { display: flex; flex-direction: column; }
+.mapel-manage-page { padding: 22px; display: none; flex: 1; overflow-y: auto; height: 0; }
+.mapel-manage-page.active { display: block; }
 .mapel-add-row { display: flex; gap: 8px; margin-bottom: 18px; align-items: center; }
 .mapel-add-input {
   flex: 1; padding: 9px 12px; background: var(--surface2);
