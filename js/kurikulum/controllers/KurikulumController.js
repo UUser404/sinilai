@@ -181,19 +181,7 @@ class KurikulumController {
 
       if (resGuru.status === 'ok') {
         _state.guruList = (resGuru.guru || [])
-          .filter(g => g.role === 'guru' || !g.role)
-          .map(g => {
-            // Auto-generate penugasan dari field mapel+kelas lama (kolom 5&6)
-            // jika penugasan JSON (kolom 9) masih kosong
-            if ((!g.penugasan || g.penugasan.length === 0) && g.mapel && g.mapel.trim()) {
-              const mapelArr = g.mapel.split(',').map(m => m.trim()).filter(Boolean);
-              const kelasArr = g.kelas ? g.kelas.split(',').map(k => k.trim()).filter(Boolean) : [];
-              if (mapelArr.length > 0) {
-                g.penugasan = mapelArr.map(m => ({ mapel: m, kelas: [...kelasArr] }));
-              }
-            }
-            return g;
-          });
+          .filter(g => g.role === 'guru' || !g.role);
       }
 
       if (resMapel.status === 'ok') _state.mapelList = resMapel.mapel || [];
