@@ -106,7 +106,7 @@ class ProfilModule {
         </div>
         <div class="pf-row pf-row-last">
           <span class="pf-label">Versi</span>
-          <span class="pf-value">2.1</span>
+          <span class="pf-value">v1.0.0</span>
         </div>
       </div>
 
