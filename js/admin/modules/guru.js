@@ -25,12 +25,20 @@ class GuruModule {
     UI.$('guruBody').innerHTML = data.length
       ? data.map(g => {
           const isKuri = g.role === 'kurikulum';
+
+          // Baca mapel & kelas dari penugasan (kolom 7 JSON)
+          const penugasan  = Array.isArray(g.penugasan) ? g.penugasan : [];
+          const mapelList  = penugasan.map(p => p.mapel).filter(Boolean);
+          const kelasList  = [...new Set(penugasan.flatMap(p => p.kelas || []).filter(Boolean))].sort();
+          const mapelStr   = mapelList.length  ? mapelList.join(', ')  : '—';
+          const kelasStr   = kelasList.length  ? kelasList.join(', ')  : '—';
+
           return `
             <tr>
               <td class="name">${g.nama}</td>
               <td><span class="badge gray">${g.username}</span></td>
-              <td>${isKuri ? '—' : (g.mapel || '—')}</td>
-              <td>${isKuri ? '—' : (g.kelas || '—')}</td>
+              <td>${isKuri ? '—' : mapelStr}</td>
+              <td>${isKuri ? '—' : kelasStr}</td>
               <td>
                 <span class="badge ${isKuri ? 'amber' : 'blue'}" style="margin-right:4px">
                   ${isKuri ? 'Kurikulum' : 'Guru'}
@@ -60,8 +68,6 @@ class GuruModule {
     UI.$('guruNama').value      = g.nama;
     UI.$('guruUsername').value  = g.username;
     UI.$('guruNip').value       = g.nip   || '';
-    UI.$('guruMapel').value     = g.mapel || '';
-    UI.$('guruKelas').value     = g.kelas || '';
     UI.$('guruStatus').value    = g.status || 'Aktif';
     UI.$('guruStatusAlt').value = g.status || 'Aktif';
     UI.$('guruRole').value      = g.role   || 'guru';
@@ -131,16 +137,16 @@ class GuruModule {
       nama:     UI.$('guruNama').value.trim(),
       username: UI.$('guruUsername').value.trim(),
       password: UI.$('guruPassword').value,
-      nip:      isGuru ? UI.$('guruNip').value.trim()   : '',
-      mapel:    isGuru ? UI.$('guruMapel').value.trim() : '',
-      kelas:    isGuru ? UI.$('guruKelas').value.trim() : '',
+      nip:      isGuru ? UI.$('guruNip').value.trim() : '',
+      mapel:    '',
+      kelas:    '',
       status,
       role,
     };
   }
 
   _clearForm() {
-    ['guruNama', 'guruUsername', 'guruPassword', 'guruNip', 'guruMapel', 'guruKelas']
+    ['guruNama', 'guruUsername', 'guruPassword', 'guruNip']
       .forEach(id => { if (UI.$(id)) UI.$(id).value = ''; });
     UI.$('guruStatus').value    = 'Aktif';
     UI.$('guruStatusAlt').value = 'Aktif';
