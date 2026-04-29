@@ -80,7 +80,7 @@ class GuruController {
     setTimeout(() => {
       const mapelSel = UI.$('ctxMapel');
       const kelasSel = UI.$('ctxKelas');
-      if (mapelSel) mapelSel.value = mapel;
+      if (mapelSel) { mapelSel.value = mapel; this._onMapelChange(); }
       if (kelasSel) kelasSel.value = kelas;
     }, 50);
   }
@@ -234,7 +234,19 @@ class GuruController {
     mapelSel.innerHTML = '<option value="">— Pilih —</option>';
     kelasSel.innerHTML = '<option value="">— Pilih —</option>';
     (this._guru.mapel || []).forEach(m => mapelSel.innerHTML += `<option>${m}</option>`);
-    (this._guru.kelas || []).forEach(k => kelasSel.innerHTML += `<option>${k}</option>`);
+    // Bind onchange mapel → update kelas dropdown
+    mapelSel.onchange = () => this._onMapelChange();
+  }
+
+  _onMapelChange() {
+    const mapelSel = UI.$('ctxMapel');
+    const kelasSel = UI.$('ctxKelas');
+    const selected = mapelSel.value;
+    kelasSel.innerHTML = '<option value="">— Pilih —</option>';
+    if (!selected) return;
+    const penugasan = this._guru.penugasan || [];
+    const entry = penugasan.find(p => p.mapel === selected);
+    (entry?.kelas || []).forEach(k => kelasSel.innerHTML += `<option>${k}</option>`);
   }
 
   _getCtx() {
@@ -294,6 +306,7 @@ class GuruController {
     UI.$('ctxSemester').value = ctx.semester || '';
     setTimeout(() => {
       UI.$('ctxMapel').value = ctx.mapel || '';
+      this._onMapelChange();
       UI.$('ctxKelas').value = ctx.kelas || '';
       if (ctx.tahun && ctx.semester && ctx.mapel && ctx.kelas) this.loadSiswa();
     }, 50);
