@@ -55,14 +55,21 @@ class AuthService {
       Security.clearLoginAttempts();
 
       const data = this.role === 'guru'
-        ? {
-            nama:     res.nama,
-            username: res.username,
-            nip:      res.nip,
-            role:     res.role,
-            mapel:    Sanitizer.parseCSV(res.mapel),
-            kelas:    Sanitizer.parseCSV(res.kelas),
-          }
+        ? (() => {
+            // Mapel & kelas diambil dari penugasan kurikulum (kolom Penugasan JSON)
+            const penugasan = Array.isArray(res.penugasan) ? res.penugasan : [];
+            const mapel = [...new Set(penugasan.map(p => p.mapel).filter(Boolean))];
+            const kelas = [...new Set(penugasan.flatMap(p => p.kelas || []).filter(Boolean))];
+            return {
+              nama:      res.nama,
+              username:  res.username,
+              nip:       res.nip,
+              role:      res.role,
+              penugasan: penugasan,
+              mapel,
+              kelas,
+            };
+          })()
         : username;
 
       if (this.role === 'guru') sessionService.saveGuru(data);
