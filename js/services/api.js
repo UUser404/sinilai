@@ -60,6 +60,11 @@ class ApiService {
 
   deleteHistory(hari)      { return this._http.post({ action: 'deleteHistory' }, { hari }); }
 
+  // ── Export Absensi & Nilai ────────────────────────────────
+  exportAbsensiNilai(params) {
+    return this._http.get({ action: 'exportAbsensiDanNilai', ...params });
+  }
+
   // ── Kurikulum ─────────────────────────────────────────
   getMapel()               { return this._http.get({ action: 'getMapel' }); }
   addMapel(data)           { return this._http.post({ action: 'addMapel' }, data); }

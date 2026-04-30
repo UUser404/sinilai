@@ -20,6 +20,8 @@ class ExportModule {
   /** Render halaman export — isi dropdown sesuai mapel/kelas guru */
   renderPage() {
     if (!this._guru) return;
+    // Render section absensi di bawah
+    const absensiSection = App.absensiMod?.renderSection() || '';
 
     const mapelOpts = (this._guru.mapel || [])
       .map(m => `<option value="${m}">${m}</option>`).join('');
@@ -105,6 +107,8 @@ class ExportModule {
           </table>
         </div>
       </div>
+
+      ${absensiSection}
     `;
   }
 

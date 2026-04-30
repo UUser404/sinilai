@@ -12,6 +12,7 @@ class GuruController {
     this.excelMod  = new ExcelModule(this.nilaiMod);
     this.analisis  = new AnalisisModule(this.nilaiMod);
     this.exportMod = new ExportModule();
+    this.absensiMod = new AbsensiModule();
     this.homeMod   = new HomeModule(this.nilaiMod, this.analisis);
     this.profilMod = new ProfilModule();
     this._auth     = new AuthService('guru', {
@@ -198,6 +199,7 @@ class GuruController {
   _enterApp(guru) {
     this._guru = guru;
     this.exportMod.setGuru(guru);
+    this.absensiMod.setGuru(guru);
     this.homeMod.setGuru(guru);
     this.profilMod.setGuru(guru);
     document.body.classList.add('app-ready');
