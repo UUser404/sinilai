@@ -1,43 +1,20 @@
 /* =====================================================
-   guru.css — Stylesheet Portal Guru (index.html)
+   css/guru.css — Portal Guru (index.html)
+   Depends: base.css, theme-light.css
+   Berisi: komponen & layout spesifik portal guru
    ===================================================== */
 
+/* ── Override primary-light untuk light theme ── */
+/* base.css pakai rgba, guru.css perlu solid color agar chip terlihat */
 :root {
-  --bg: #f0f2f5;
-  --surface: #ffffff;
-  --surface2: #f7f8fa;
-  --border: #e2e5ea;
-  --border2: #d0d5de;
-  --primary: #1a56db;
-  --primary-dark: #1344b5;
   --primary-light: #e8effe;
-  --accent: #f59e0b;
-  --accent-light: #fef3c7;
-  --text: #0f172a;
-  --text2: #475569;
-  --text3: #94a3b8;
-  --success: #059669;
-  --success-bg: #ecfdf5;
-  --error: #dc2626;
-  --error-bg: #fef2f2;
-  --warn: #d97706;
-  --warn-bg: #fffbeb;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
-  --radius: 10px;
-  --radius-sm: 6px;
-  --g-sidebar-w: 220px;
+  --accent-light:  #fef3c7;
+  --success-bg:    #ecfdf5;
+  --error-bg:      #fef2f2;
+  --warn-bg:       #fffbeb;
+  --g-sidebar-w:   220px; /* alias untuk kompatibilitas komponen guru */
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
 
 /* ── LOGIN SCREEN ── */
 #loginScreen {

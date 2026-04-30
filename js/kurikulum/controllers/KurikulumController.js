@@ -112,20 +112,24 @@ class KurikulumController {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     btn.classList.add('active');
 
+    const layout = document.querySelector('.kuri-layout');
+
     if (page === 'penugasan') {
-      UI.$('kuriListPanel').style.display    = '';
+      layout?.classList.remove('mapel-mode');
+      UI.$('kuriListPanel').style.display     = '';
       UI.$('kdTopbarPenugasan').style.display = '';
-      UI.$('kdTopbarMapel').style.display    = 'none';
-      UI.$('pagePenugasan').style.display    = '';
+      UI.$('kdTopbarMapel').style.display     = 'none';
+      UI.$('pagePenugasan').style.display     = '';
       UI.$('pageMapel').classList.remove('active');
-      UI.$('savePenugasanBar').style.display = '';
+      UI.$('savePenugasanBar').style.display  = '';
     } else {
-      UI.$('kuriListPanel').style.display    = 'none';
+      layout?.classList.add('mapel-mode');
+      UI.$('kuriListPanel').style.display     = 'none';
       UI.$('kdTopbarPenugasan').style.display = 'none';
-      UI.$('kdTopbarMapel').style.display    = '';
-      UI.$('pagePenugasan').style.display    = 'none';
+      UI.$('kdTopbarMapel').style.display     = '';
+      UI.$('pagePenugasan').style.display     = 'none';
       UI.$('pageMapel').classList.add('active');
-      UI.$('savePenugasanBar').style.display = 'none';
+      UI.$('savePenugasanBar').style.display  = 'none';
       this.mapel.render();
     }
   }

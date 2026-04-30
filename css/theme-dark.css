@@ -1,0 +1,18 @@
+/* =====================================================
+   css/theme-dark.css
+   SiNilai — Dark Theme Tokens
+   Dipakai oleh: admin.html, kurikulum.html
+   ===================================================== */
+:root {
+  --bg:       #0f172a;
+  --surface:  #1e293b;
+  --surface2: #263346;
+  --border:   rgba(255, 255, 255, 0.08);
+  --border2:  rgba(255, 255, 255, 0.13);
+  --text:     #f1f5f9;
+  --text2:    #94a3b8;
+  --text3:    #475569;
+  --shadow:    0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.45);
+}

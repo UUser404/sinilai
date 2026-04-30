@@ -1,19 +1,23 @@
 /**
  * css/kurikulum.css
  * Style khusus halaman kurikulum (desktop + mobile).
- * Bergantung pada css/admin.css untuk variabel & komponen dasar.
+ * Depends: base.css, theme-dark.css
  */
 
-/* ══════════════════════════════════════════════
-   DESKTOP — SPLIT LAYOUT
-══════════════════════════════════════════════ */
+/* Saat halaman mapel aktif, detail mengisi full width */
+.kuri-layout.mapel-mode .kuri-detail { width: 100%; }
+.mapel-manage-page { padding: 22px; display: none; flex: 1; overflow-y: auto; height: 0; }
+.mapel-manage-page.active { display: block; }
 .kuri-layout {
   display: flex; height: 100vh; overflow: hidden;
+  width: 100%;
 }
 .kuri-list {
   width: 280px; flex-shrink: 0;
   background: var(--surface); border-right: 1px solid var(--border);
-  display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+  display: flex; flex-direction: column; overflow: hidden;
+  /* Ikuti tinggi parent, tidak perlu 100vh sendiri */
+  align-self: stretch;
 }
 .kuri-list-top {
   padding: 14px 14px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0;
@@ -62,28 +66,34 @@
 /* ── DETAIL PANE ── */
 .kuri-detail {
   flex: 1; min-width: 0; display: flex; flex-direction: column;
-  height: 100vh; overflow: hidden;
+  overflow: hidden;
 }
 .kd-topbar {
   padding: 13px 22px; border-bottom: 1px solid var(--border);
   background: var(--surface); display: flex; align-items: center;
-  justify-content: space-between; flex-shrink: 0;
+  justify-content: space-between; flex-shrink: 0; gap: 16px; min-width: 0;
 }
-.kd-title { font-size: 14px; font-weight: 700; color: var(--text); }
+/* Teks judul tidak terpotong */
+.kd-topbar > div:first-child { min-width: 0; flex: 1; }
+.kd-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .kd-sub   { font-size: 11px; color: var(--text2); margin-top: 2px; }
 .kd-scroll { flex: 1; overflow-y: auto; padding: 20px 22px; }
 .kd-scroll::-webkit-scrollbar { width: 4px; }
 .kd-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
 
 /* STATS PILLS */
-.stats-pills { display: flex; gap: 10px; margin-bottom: 16px; }
+.stats-pills { display: flex; gap: 10px; margin-bottom: 16px; flex-shrink: 0; }
 .stat-pill {
-  padding: 10px 16px; border-radius: var(--radius-sm);
-  background: var(--surface); border: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px; border-radius: var(--radius-sm);
+  background: var(--surface2); border: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 60px; text-align: center;
 }
-.sp-val { font-size: 20px; font-weight: 800; color: var(--text); }
-.sp-lbl { font-size: 10px; color: var(--text2); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+.sp-val { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1; }
+.sp-lbl { font-size: 10px; color: var(--text2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
 
 /* STEP CARDS */
 .step-card {
@@ -111,8 +121,12 @@
   padding: 7px 13px; border-radius: var(--radius-sm);
   font-size: 12px; font-weight: 600;
   border: 1.5px solid var(--border2); color: var(--text2);
-  cursor: pointer; transition: all 0.15s; font-family: inherit;
-  background: transparent; display: flex; align-items: center; gap: 6px;
+  cursor: pointer; transition: background 0.1s, border-color 0.1s, color 0.1s;
+  font-family: inherit; background: transparent;
+  display: flex; align-items: center; gap: 6px;
+  white-space: nowrap; flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .mc:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
 .mc.on    { border-color: var(--primary); background: var(--primary); color: white; }
@@ -608,6 +622,3 @@
   .k-mobile-pages  { display: none !important; }
   .k-float-save    { display: none !important; }
 }
-
-@keyframes fadeIn  { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
