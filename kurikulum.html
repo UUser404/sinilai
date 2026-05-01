@@ -62,6 +62,13 @@
     <button class="nav-item" id="navMapel" onclick="App.showPage('mapel', this)">
       <span class="icon">📚</span> Kelola Mata Pelajaran
     </button>
+    <div class="nav-label" style="margin-top:12px">Monitoring Nilai</div>
+    <button class="nav-item" id="navRekap" onclick="App.showPage('rekap', this)">
+      <span class="icon">📊</span> Rekap Pengisian Nilai
+    </button>
+    <button class="nav-item" id="navAnalisis" onclick="App.showPage('analisis', this)">
+      <span class="icon">📈</span> Analisis Nilai
+    </button>
   </nav>
   <div class="sidebar-footer">
     <div class="admin-chip">
@@ -118,6 +125,22 @@
         </div>
       </div>
 
+      <!-- Topbar rekap -->
+      <div class="kd-topbar" id="kdTopbarRekap" style="display:none">
+        <div>
+          <div class="kd-title">📊 Rekap Pengisian Nilai</div>
+          <div class="kd-sub">Monitor progres pengisian nilai semua guru</div>
+        </div>
+      </div>
+
+      <!-- Topbar analisis -->
+      <div class="kd-topbar" id="kdTopbarAnalisis" style="display:none">
+        <div>
+          <div class="kd-title">📈 Analisis Nilai</div>
+          <div class="kd-sub">Rata-rata PTS & UAS per mapel dan rombel</div>
+        </div>
+      </div>
+
       <!-- Konten penugasan -->
       <div class="kd-scroll" id="pagePenugasan">
         <div id="emptyState" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:60%;color:var(--text3);gap:12px">
@@ -166,6 +189,12 @@
         </div>
       </div>
 
+      <!-- Konten rekap nilai -->
+      <div class="kd-scroll" id="pageRekap" style="display:none"></div>
+
+      <!-- Konten analisis nilai -->
+      <div class="kd-scroll" id="pageAnalisis" style="display:none"></div>
+
       <!-- Save bar desktop -->
       <div class="save-bar" id="savePenugasanBar">
         <div class="sb-txt">Ada <strong>perubahan belum disimpan</strong></div>
@@ -201,6 +230,11 @@
       <button class="k-quick-btn" onclick="App.mobile.goPage('penugasan')">
         <div class="k-quick-icon blue">📋</div>
         <div><div class="k-quick-txt">Penugasan Guru</div><div class="k-quick-sub">Atur mapel &amp; kelas tiap guru</div></div>
+        <div class="k-quick-chevron">›</div>
+      </button>
+      <button class="k-quick-btn" onclick="App.mobile.goPage('monitoring')">
+        <div class="k-quick-icon blue">📊</div>
+        <div><div class="k-quick-txt">Monitoring Nilai</div><div class="k-quick-sub">Rekap pengisian & analisis nilai</div></div>
         <div class="k-quick-chevron">›</div>
       </button>
       <button class="k-quick-btn" onclick="App.mobile.goPage('mapel')">
@@ -274,6 +308,64 @@
     </div>
   </div>
 
+  <!-- MONITORING: LANDING PAGE -->
+  <div class="k-page" id="k-page-monitoring">
+    <div style="padding-top:66px">
+      <div style="margin-bottom:16px">
+        <div style="font-size:18px;font-weight:800;color:var(--text)">📊 Monitoring Nilai</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">Pilih jenis monitoring yang ingin dilihat</div>
+      </div>
+      <button class="k-quick-btn" onclick="App.mobile.goPage('rekap')">
+        <div class="k-quick-icon blue">📋</div>
+        <div>
+          <div class="k-quick-txt">Rekap Pengisian Nilai</div>
+          <div class="k-quick-sub">Monitor progres pengisian nilai semua guru</div>
+        </div>
+        <div class="k-quick-chevron">›</div>
+      </button>
+      <button class="k-quick-btn" onclick="App.mobile.goPage('analisis')">
+        <div class="k-quick-icon purple">📈</div>
+        <div>
+          <div class="k-quick-txt">Analisis Nilai</div>
+          <div class="k-quick-sub">Rata-rata PTS & UAS per mapel dan rombel</div>
+        </div>
+        <div class="k-quick-chevron">›</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- REKAP PENGISIAN NILAI -->
+  <div class="k-page" id="k-page-rekap">
+    <div style="padding-top:66px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <button onclick="App.mobile.goPage('monitoring')" style="background:none;border:none;font-size:18px;color:var(--text2);cursor:pointer;padding:0;line-height:1">←</button>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">📋 Rekap Pengisian Nilai</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">Monitor progres pengisian nilai semua guru</div>
+        </div>
+      </div>
+      <div id="k-page-rekap-content">
+        <div class="k-empty"><div class="k-empty-icon">📊</div><div class="k-empty-sub">Memuat...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALISIS NILAI -->
+  <div class="k-page" id="k-page-analisis">
+    <div style="padding-top:66px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <button onclick="App.mobile.goPage('monitoring')" style="background:none;border:none;font-size:18px;color:var(--text2);cursor:pointer;padding:0;line-height:1">←</button>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">📈 Analisis Nilai</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">Rata-rata PTS & UAS per mapel dan rombel</div>
+        </div>
+      </div>
+      <div id="k-page-analisis-content">
+        <div class="k-empty"><div class="k-empty-icon">📈</div><div class="k-empty-sub">Memuat...</div></div>
+      </div>
+    </div>
+  </div>
+
   <!-- KELOLA MAPEL -->
   <div class="k-page" id="k-page-mapel">
     <div style="padding-top:66px">
@@ -336,6 +428,10 @@
     <span class="k-bn-label">Guru</span>
     <div class="k-bn-badge" id="kBnBadgePen"></div>
   </button>
+  <button class="k-bn-btn" data-page="monitoring" onclick="App.mobile.goPage('monitoring')">
+    <svg class="k-bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span class="k-bn-label">Monitoring</span>
+  </button>
   <button class="k-bn-btn" data-page="mapel" onclick="App.mobile.goPage('mapel')">
     <svg class="k-bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
     <span class="k-bn-label">Mapel</span>
@@ -393,6 +489,8 @@
 <script src="js/kurikulum/modules/penugasan.js"></script>
 <script src="js/kurikulum/modules/mapel.js"></script>
 <script src="js/kurikulum/modules/mobile.js"></script>
+<script src="js/kurikulum/modules/analisis.js"></script>
+<script src="js/kurikulum/modules/rekap.js"></script>
 
 <!-- Controller kurikulum -->
 <script src="js/kurikulum/controllers/KurikulumController.js"></script>

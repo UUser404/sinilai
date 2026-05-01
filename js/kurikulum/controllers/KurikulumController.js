@@ -15,6 +15,8 @@ const _state = {
   penDirty        : false,
   openAcc         : null,
   currentMobilePage: 'home',
+  filterSemester  : '',
+  filterTahun     : '',
 };
 
 // ── Shared helpers ───────────────────────────────────────────────────────────
@@ -67,6 +69,8 @@ class KurikulumController {
     this.penugasan = new PenugasanModule(_state);
     this.mapel     = new MapelModule(_state);
     this.mobile    = new MobileModule(_state);
+    this.rekap     = new RekapModule(_state);
+    this.analisis  = new AnalisisModule(_state);
 
     this._bindEvents();
     this._restoreSession();
@@ -119,16 +123,50 @@ class KurikulumController {
       UI.$('kuriListPanel').style.display     = '';
       UI.$('kdTopbarPenugasan').style.display = '';
       UI.$('kdTopbarMapel').style.display     = 'none';
+      UI.$('kdTopbarRekap').style.display     = 'none';
       UI.$('pagePenugasan').style.display     = '';
       UI.$('pageMapel').classList.remove('active');
+      UI.$('pageRekap').style.display         = 'none';
+      UI.$('pageAnalisis').style.display      = 'none';
+      UI.$('kdTopbarAnalisis').style.display  = 'none';
       UI.$('savePenugasanBar').style.display  = '';
+    } else if (page === 'rekap') {
+      layout?.classList.add('mapel-mode');
+      UI.$('kuriListPanel').style.display     = 'none';
+      UI.$('kdTopbarPenugasan').style.display = 'none';
+      UI.$('kdTopbarMapel').style.display     = 'none';
+      UI.$('kdTopbarRekap').style.display     = '';
+      UI.$('kdTopbarAnalisis').style.display  = 'none';
+      UI.$('pagePenugasan').style.display     = 'none';
+      UI.$('pageMapel').classList.remove('active');
+      UI.$('pageRekap').style.display         = '';
+      UI.$('pageAnalisis').style.display      = 'none';
+      UI.$('savePenugasanBar').style.display  = 'none';
+      this.rekap.render();
+    } else if (page === 'analisis') {
+      layout?.classList.add('mapel-mode');
+      UI.$('kuriListPanel').style.display     = 'none';
+      UI.$('kdTopbarPenugasan').style.display = 'none';
+      UI.$('kdTopbarMapel').style.display     = 'none';
+      UI.$('kdTopbarRekap').style.display     = 'none';
+      UI.$('kdTopbarAnalisis').style.display  = '';
+      UI.$('pagePenugasan').style.display     = 'none';
+      UI.$('pageMapel').classList.remove('active');
+      UI.$('pageRekap').style.display         = 'none';
+      UI.$('pageAnalisis').style.display      = '';
+      UI.$('savePenugasanBar').style.display  = 'none';
+      this.analisis.render();
     } else {
       layout?.classList.add('mapel-mode');
       UI.$('kuriListPanel').style.display     = 'none';
       UI.$('kdTopbarPenugasan').style.display = 'none';
       UI.$('kdTopbarMapel').style.display     = '';
+      UI.$('kdTopbarRekap').style.display     = 'none';
       UI.$('pagePenugasan').style.display     = 'none';
       UI.$('pageMapel').classList.add('active');
+      UI.$('pageRekap').style.display         = 'none';
+      UI.$('pageAnalisis').style.display      = 'none';
+      UI.$('kdTopbarAnalisis').style.display  = 'none';
       UI.$('savePenugasanBar').style.display  = 'none';
       this.mapel.render();
     }

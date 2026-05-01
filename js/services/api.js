@@ -71,6 +71,9 @@ class ApiService {
   editMapel(data)          { return this._http.post({ action: 'editMapel' }, data); }
   deleteMapel(data)        { return this._http.post({ action: 'deleteMapel' }, data); }
   savePenugasan(data)      { return this._http.post({ action: 'savePenugasan' }, data); }
+  getAvailablePeriode()    { return this._http.get({ action: 'getAvailablePeriode' }); }
+  getNilaiSummary(params)  { return this._http.get({ action: 'getNilaiSummary', ...params }); }
+  getAnalisisNilai(params) { return this._http.get({ action: 'getAnalisisNilai', ...params }); }
 
   async _saveNilaiBatch({ data, ...meta }) {
     const total = Math.ceil(data.length / Config.BATCH_SIZE);

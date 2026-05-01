@@ -8,24 +8,29 @@ class MobileModule {
   }
 
   goPage(page) {
-    // Update bottom nav active state
-    document.querySelectorAll('.k-bn-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.page === page);
-    });
-
     // Show target page
     const pageMap = {
-      home      : 'k-page-home',
-      penugasan : 'k-page-penugasan',
-      mapel     : 'k-page-mapel',
-      profil    : 'k-page-profil',
+      home       : 'k-page-home',
+      penugasan  : 'k-page-penugasan',
+      monitoring : 'k-page-monitoring',
+      rekap      : 'k-page-rekap',
+      analisis   : 'k-page-analisis',
+      mapel      : 'k-page-mapel',
+      profil     : 'k-page-profil',
     };
     document.querySelectorAll('.k-page').forEach(p => p.classList.remove('active'));
     const target = UI.$(pageMap[page]);
     if (target) target.classList.add('active');
 
-    // Render mapel list when navigating there
-    if (page === 'mapel') App.mapel.renderM();
+    // Bottom nav: "monitoring" mencakup rekap & analisis
+    const bnPage = (page === 'rekap' || page === 'analisis') ? 'monitoring' : page;
+    document.querySelectorAll('.k-bn-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.page === bnPage);
+    });
+
+    if (page === 'mapel')    App.mapel.renderM();
+    if (page === 'rekap')    App.rekap.renderM();
+    if (page === 'analisis') App.analisis.renderM();
 
     this._s.currentMobilePage = page;
   }
