@@ -2,17 +2,8 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SiNilai — Portal Guru</title>
-
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#1a73e8" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="SiNilai" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/theme-light.css" />
@@ -280,27 +271,38 @@ function togglePassword(inputId, btn) {
   input.focus();
 }
 </script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => {
-            // Cek update SW saat app dibuka
-            reg.addEventListener('updatefound', () => {
-              const newSW = reg.installing;
-              newSW.addEventListener('statechange', () => {
-                if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                  // Ada versi baru — beri tahu user
-                  if (confirm('Versi baru SiNilai tersedia. Muat ulang sekarang?')) {
-                    window.location.reload();
-                  }
-                }
-              });
-            });
-          })
-          .catch(err => console.warn('SW registration failed:', err));
-      });
-    }
-  </script>
+  <!-- MODAL PREVIEW UPLOAD NILAI -->
+  <div class="modal-overlay" id="modalUploadPreview" style="display:none">
+    <div class="modal" style="max-width:480px">
+      <div class="modal-header">
+        <span class="modal-title">📊 Preview Import Nilai</span>
+        <button class="modal-close" onclick="App.excel.cancel()">×</button>
+      </div>
+      <div class="modal-body" id="uploadPreviewBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="App.excel.cancel()">Batal</button>
+        <button class="btn btn-primary" id="btnKonfirmasiUpload" onclick="App.excel.confirm()">
+          ✓ Konfirmasi Import
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ERROR UPLOAD -->
+  <div class="modal-overlay" id="modalUploadError" style="display:none">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-header">
+        <span class="modal-title" style="color:var(--error)">⚠️ <span id="uploadErrorJudul">Error</span></span>
+        <button class="modal-close" onclick="closeModal('modalUploadError')">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="uploadErrorPesan" style="font-size:13px;color:var(--text);line-height:1.6"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeModal('modalUploadError')">Mengerti</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
