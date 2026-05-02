@@ -44,7 +44,14 @@ class NilaiModule {
   handleInput(input) {
     const idx = +input.dataset.idx;
     const col = input.dataset.col;
-    this.data[idx].nilai[col] = input.value === '' ? '' : parseFloat(input.value);
+
+    // Sanitasi realtime: clamp 0-100, max 3 digit
+    const { value, clamped } = Validator.nilaiInputLive(input.value);
+    if (clamped || input.value !== value) {
+      input.value = value;
+    }
+
+    this.data[idx].nilai[col] = value === '' ? '' : parseFloat(value);
     this._calc.update(this.data.map(s => s.nilai));
 
     const modified = JSON.stringify(this.data[idx].nilai) !== JSON.stringify(this._orig[idx].nilai);
@@ -56,6 +63,8 @@ class NilaiModule {
 
   handleKeydown(e) {
     if (Validator.isBlockedKey(e.key)) { e.preventDefault(); return; }
+    // Blokir titik desimal — nilai harus bilangan bulat 0-100
+    if (e.key === '.') { e.preventDefault(); return; }
     if (e.key === 'Enter') { e.preventDefault(); this._moveDown(e.target); }
   }
 

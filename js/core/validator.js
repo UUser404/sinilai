@@ -27,6 +27,36 @@ class Validator {
     return { value: clean, valid: true };
   }
 
+  /**
+   * Sanitasi realtime saat mengetik — clamp 0-100, max 3 digit integer.
+   * Dipanggil di oninput sebelum disimpan ke data.
+   * @returns {{ value: string, clamped: boolean }}
+   */
+  static nilaiInputLive(raw) {
+    if (raw === '' || raw === null || raw === undefined)
+      return { value: '', clamped: false };
+
+    // Buang semua karakter non-numerik kecuali satu titik
+    let clean = String(raw).replace(/[^0-9.]/g, '');
+    const parts = clean.split('.');
+    if (parts.length > 2) clean = parts[0] + '.' + parts.slice(1).join('');
+
+    // Batasi bagian integer max 3 digit agar tidak bisa ketik 4+ digit
+    const intPart = clean.split('.')[0];
+    const decPart = clean.split('.')[1];
+    let trimmed = intPart.slice(0, 3);
+    if (decPart !== undefined) trimmed += '.' + decPart.slice(0, 1);
+
+    const v = parseFloat(trimmed);
+    if (isNaN(v)) return { value: '', clamped: false };
+
+    // Clamp 0-100
+    if (v > 100) return { value: '100', clamped: true };
+    if (v < 0)   return { value: '0',   clamped: true };
+
+    return { value: trimmed, clamped: false };
+  }
+
   /** Apakah karakter keyboard ini diblokir untuk input nilai? */
   static isBlockedKey(key) {
     return ['-', '+', 'e', 'E'].includes(key);

@@ -702,56 +702,113 @@
 
     <!-- MODAL SISWA -->
     <div class="modal-overlay" id="modalSiswa">
-      <div class="modal">
+      <div class="modal" style="max-width:560px">
         <div class="modal-header">
-          <span class="modal-title" id="modalSiswaTitle"
-            >Tambah Siswa Baru</span
-          >
-          <button class="modal-close" onclick="closeModal('modalSiswa')">
-            ×
+          <span class="modal-title" id="modalSiswaTitle">Tambah Siswa Baru</span>
+          <button class="modal-close" onclick="closeModal('modalSiswa')">×</button>
+        </div>
+
+        <!-- Tab switcher -->
+        <div style="display:flex;border-bottom:1px solid var(--border);padding:0 20px">
+          <button id="tabSingle" onclick="Admin.siswa._switchTab('single')"
+            style="padding:10px 16px;font-size:12px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--primary);border-bottom:2px solid var(--primary);font-family:inherit">
+            + Tambah Satu
+          </button>
+          <button id="tabBatch" onclick="Admin.siswa._switchTab('batch')"
+            style="padding:10px 16px;font-size:12px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;font-family:inherit">
+            📥 Import Batch (CSV)
           </button>
         </div>
-        <div class="modal-body">
+
+        <!-- Tab: Single -->
+        <div id="panelSingle" class="modal-body">
           <div class="form-row">
             <div class="form-field">
-              <label>NIS *</label
-              ><input id="siswaNis" placeholder="Nomor Induk Siswa..." />
+              <label>NIS *</label>
+              <input id="siswaNis" placeholder="Nomor Induk Siswa..." />
             </div>
             <div class="form-field">
               <label>Kelas *</label>
               <select id="siswaKelas">
                 <option value="">— Pilih Kelas —</option>
-                <option>X-A</option>
-                <option>X-B</option>
-                <option>X-C</option>
-                <option>X-D</option>
-                <option>XI-A</option>
-                <option>XI-B</option>
-                <option>XI-C</option>
-                <option>XI-D</option>
-                <option>XII-A</option>
-                <option>XII-B</option>
-                <option>XII-C</option>
-                <option>XII-D</option>
+                <option>VII-1</option><option>VII-2</option><option>VII-3</option>
+                <option>VIII-1</option><option>VIII-2</option><option>VIII-3</option>
+                <option>IX-1</option><option>IX-2</option><option>IX-3</option>
+                <option>X-1</option><option>X-2</option><option>X-3</option>
+                <option>XI-1</option><option>XI-2</option><option>XI-3</option>
+                <option>XII-1</option><option>XII-2</option><option>XII-3</option>
               </select>
             </div>
           </div>
-          <div class="form-field" style="margin-bottom: 14px">
-            <label>Nama Lengkap *</label
-            ><input id="siswaNama" placeholder="Nama siswa..." />
+          <div class="form-field" style="margin-bottom:14px">
+            <label>Nama Lengkap *</label>
+            <input id="siswaNama" placeholder="Nama siswa..." />
           </div>
           <div class="form-field">
-            <label>Keterangan</label
-            ><input id="siswaKet" placeholder="Opsional..." />
+            <label>Keterangan</label>
+            <input id="siswaKet" placeholder="Opsional..." />
+          </div>
+        </div>
+
+        <!-- Tab: Batch -->
+        <div id="panelBatch" class="modal-body" style="display:none">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">📋 Cara import batch:</div>
+            <ol style="font-size:12px;color:var(--text2);padding-left:16px;line-height:1.8">
+              <li>Download format CSV di bawah</li>
+              <li>Isi data siswa di spreadsheet (Excel/Google Sheets)</li>
+              <li>Export/simpan sebagai <strong>.csv</strong></li>
+              <li>Upload file CSV di sini</li>
+            </ol>
+            <button class="btn btn-ghost btn-sm" onclick="Admin.siswa.downloadFormat()" style="margin-top:8px">
+              ⬇️ Download Format CSV
+            </button>
+          </div>
+          <div class="form-field">
+            <label>Upload File CSV *</label>
+            <input type="file" id="batchFileInput" accept=".csv"
+              onchange="Admin.siswa.handleFileUpload(this)"
+              style="padding:8px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);width:100%;font-family:inherit;font-size:12px" />
+          </div>
+          <div id="batchPreview"></div>
+        </div>
+
+        <div class="modal-footer" id="footerSingle">
+          <button class="btn btn-ghost" onclick="closeModal('modalSiswa')">Batal</button>
+          <button class="btn btn-primary" onclick="Admin.siswa.save()">Simpan Siswa</button>
+        </div>
+        <div class="modal-footer" id="footerBatch" style="display:none">
+          <button class="btn btn-ghost" onclick="closeModal('modalSiswa')">Batal</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL KONFIRMASI HAPUS SISWA -->
+    <div class="modal-overlay" id="modalDeleteSiswa">
+      <div class="modal" style="max-width:440px">
+        <div class="modal-header">
+          <span class="modal-title">Nonaktifkan Siswa</span>
+          <button class="modal-close" onclick="closeModal('modalDeleteSiswa')">×</button>
+        </div>
+        <div class="modal-body">
+          <div style="font-size:13px;color:var(--text);margin-bottom:12px">
+            Siswa berikut akan dinonaktifkan dan tidak akan muncul di daftar:
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px">
+            <div style="font-size:14px;font-weight:700;color:var(--text)" id="deleteNamaSiswa">—</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:4px">
+              NIS: <span id="deleteNisSiswa">—</span> &nbsp;·&nbsp;
+              Kelas: <span id="deleteKelasSiswa">—</span>
+            </div>
+          </div>
+          <div id="deleteNilaiInfo"></div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px">
+            ℹ️ Data siswa tidak dihapus permanen — hanya ditandai nonaktif. Hubungi pengembang untuk pemulihan data.
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-ghost" onclick="closeModal('modalSiswa')">
-            Batal
-          </button>
-          <button class="btn btn-primary" onclick="Admin.siswa.save()">
-            Simpan Siswa
-          </button>
+          <button class="btn btn-ghost" onclick="closeModal('modalDeleteSiswa')">Batal</button>
+          <button class="btn btn-danger" onclick="Admin.siswa.executeDelete()">Nonaktifkan</button>
         </div>
       </div>
     </div>
