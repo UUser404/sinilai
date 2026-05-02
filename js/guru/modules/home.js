@@ -131,15 +131,17 @@ class HomeModule {
   }
 
   _renderKelasList(guru) {
-    if (!guru.kelas?.length || !guru.mapel?.length) {
+    // Baca dari penugasan: [{mapel, kelas:[]}, ...]
+    // agar Fiqih X-1~X-4 dan Nahwu Shorof XI-4 tidak di-cross-join
+    const penugasan = guru.penugasan || [];
+    if (!penugasan.length) {
       return '<div class="hm-kelas-empty">Tidak ada data kelas</div>';
     }
 
-    // Buat kombinasi kelas × mapel
     const items = [];
-    guru.kelas.forEach(k => {
-      guru.mapel.forEach(m => {
-        items.push({ kelas: k, mapel: m });
+    penugasan.forEach(p => {
+      (p.kelas || []).forEach(k => {
+        items.push({ kelas: k, mapel: p.mapel });
       });
     });
 
