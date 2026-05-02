@@ -115,7 +115,7 @@
             <label>Tahun Ajaran</label>
             <select id="ctxTahun">
               <option value="">— Pilih —</option>
-              <option>2024/2025</option><option>2025/2026</option><option>2026/2027</option>
+              <!-- populated by TahunAjar.populateFromServer() on load -->
             </select>
           </div>
           <div class="ctx-field">
@@ -250,7 +250,8 @@
 <script src="js/services/bus.js"></script>
 <script src="js/services/calculator.js"></script>
 <script src="js/services/session.js"></script>
-<script src="js/services/api.js"></script>
+<script src="js/utils/tahun.js"></script>
+  <script src="js/services/api.js"></script>
 <script src="js/services/auth.js"></script>
 <script src="js/guru/modules/nilai.js"></script>
 <script src="js/guru/modules/excel.js"></script>

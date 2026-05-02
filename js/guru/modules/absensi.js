@@ -9,6 +9,11 @@ class AbsensiModule {
 
   setGuru(guru) { this._guru = guru; }
 
+  /** Dipanggil setelah renderSection() dimasukkan ke DOM */
+  afterRender() {
+    TahunAjar.populate('absTahun', '', true);
+  }
+
   // ── Render UI ─────────────────────────────────────────────
 
   renderSection() {
@@ -34,9 +39,7 @@ class AbsensiModule {
               <label>Tahun Ajaran</label>
               <select id="absTahun" class="export-select">
                 <option value="">— Pilih Tahun —</option>
-                <option>2024/2025</option>
-                <option>2025/2026</option>
-                <option>2026/2027</option>
+                <!-- populated by TahunAjar -->
               </select>
             </div>
             <div class="export-field">

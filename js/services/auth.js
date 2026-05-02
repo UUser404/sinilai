@@ -51,6 +51,14 @@ class AuthService {
         return;
       }
 
+      // Halaman guru: hanya role 'guru' yang boleh masuk
+      if (this.role === 'guru' && res.role !== 'guru') {
+        Security.recordFailedLogin();
+        const label = res.role === 'admin' ? 'Admin' : res.role === 'kurikulum' ? 'Kurikulum' : res.role;
+        this._onError(`Akun ${label} tidak dapat login di halaman guru. Gunakan halaman yang sesuai.`);
+        return;
+      }
+
       // Login sukses — reset rate limit
       Security.clearLoginAttempts();
 

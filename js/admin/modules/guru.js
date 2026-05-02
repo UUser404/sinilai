@@ -24,24 +24,30 @@ class GuruModule {
   render(data = this.data) {
     UI.$('guruBody').innerHTML = data.length
       ? data.map(g => {
-          const isKuri = g.role === 'kurikulum';
+          const isKuri  = g.role === 'kurikulum';
+          const isAdmin = g.role === 'admin';
+          const isNonGuru = isKuri || isAdmin;
 
-          // Baca mapel & kelas dari penugasan (kolom 7 JSON)
+          // Baca penugasan — tampilkan per mapel beserta kelasnya
           const penugasan  = Array.isArray(g.penugasan) ? g.penugasan : [];
-          const mapelList  = penugasan.map(p => p.mapel).filter(Boolean);
-          const kelasList  = [...new Set(penugasan.flatMap(p => p.kelas || []).filter(Boolean))].sort();
-          const mapelStr   = mapelList.length  ? mapelList.join(', ')  : '—';
-          const kelasStr   = kelasList.length  ? kelasList.join(', ')  : '—';
+          const penugasanStr = penugasan.length
+            ? penugasan.map(p =>
+                `<div style="margin-bottom:2px">
+                  <span style="font-weight:600;color:var(--text)">${p.mapel}</span>
+                  <span style="color:var(--text3);margin:0 3px">→</span>
+                  <span style="color:var(--text2);font-size:11px">${(p.kelas||[]).join(', ')}</span>
+                </div>`
+              ).join('')
+            : '—';
 
           return `
             <tr>
               <td class="name">${g.nama}</td>
               <td><span class="badge gray">${g.username}</span></td>
-              <td>${isKuri ? '—' : mapelStr}</td>
-              <td>${isKuri ? '—' : kelasStr}</td>
+              <td colspan="2" style="min-width:320px">${isNonGuru ? '—' : penugasanStr}</td>
               <td>
-                <span class="badge ${isKuri ? 'amber' : 'blue'}" style="margin-right:4px">
-                  ${isKuri ? 'Kurikulum' : 'Guru'}
+                <span class="badge ${isAdmin ? 'red' : isKuri ? 'amber' : 'blue'}" style="margin-right:4px">
+                  ${isAdmin ? 'Admin' : isKuri ? 'Kurikulum' : 'Guru'}
                 </span>
                 <span class="badge ${g.status === 'Aktif' ? 'green' : 'gray'}">${g.status}</span>
               </td>

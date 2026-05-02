@@ -53,8 +53,15 @@ class SiswaModule {
   // ── Tambah Satu ───────────────────────────────────────────────────────────
   openAdd() {
     this._clearForm();
+    this._populateKelasDropdown();
+    TahunAjar.populateInputPair('siswaTaAwal', 'siswaTaAkhirLabel');
     UI.$('modalSiswaTitle').textContent = 'Tambah Siswa Baru';
-    UI.$('tabSingle').click();
+    // Tampilkan tab batch saat tambah
+    UI.$('siswaTabNav').style.display = '';
+    UI.$('tabBatch').style.display = '';
+    const nisInput = UI.$('siswaNis');
+    if (nisInput) nisInput.readOnly = false;
+    this._switchTab('single');
     openModal('modalSiswa');
   }
 
@@ -65,11 +72,13 @@ class SiswaModule {
     UI.$('modalSiswaTitle').textContent = 'Edit Data Siswa';
     UI.$('siswaNis').value   = s.nis;
     UI.$('siswaNama').value  = s.nama;
-    UI.$('siswaKelas').value = s.kelas;
-    UI.$('siswaKet').value   = s.keterangan || '';
+    this._populateKelasDropdown(s.kelas);
+    TahunAjar.populateInputPair('siswaTaAwal', 'siswaTaAkhirLabel', s.tahunAjar || '');
     // Sembunyikan tab batch saat edit
-    UI.$('tabBatch').style.display = 'none';
-    UI.$('tabSingle').click();
+    UI.$('siswaTabNav').style.display = 'none';
+    this._switchTab('single');
+    const nisInput = UI.$('siswaNis');
+    if (nisInput) nisInput.readOnly = true;
     openModal('modalSiswa');
   }
 
@@ -86,7 +95,6 @@ class SiswaModule {
         UI.showToast(`✓ Siswa "${payload.nama}" berhasil ${isEdit ? 'diperbarui' : 'ditambahkan'}`, 'success');
         closeModal('modalSiswa');
         this._clearForm();
-        UI.$('tabBatch').style.display = '';
         await this.load();
       } else {
         UI.showToast('Gagal: ' + (res.message || 'Error'), 'error');
@@ -100,11 +108,12 @@ class SiswaModule {
 
   // ── Batch Add ─────────────────────────────────────────────────────────────
   downloadFormat() {
-    const header = 'NIS,Nama Lengkap,Kelas,Keterangan';
+    const ta      = TahunAjar.defaultAktif();
+    const header = `NIS,Nama Lengkap,Kelas,TA`;
     const contoh = [
-      '12345,Ahmad Fauzi,X-1,',
-      '12346,Siti Nurhaliza,X-1,Pindahan',
-      '12347,Budi Santoso,XI-2,',
+      `12345,Ahmad Fauzi,X-1,${ta}`,
+      `12346,Siti Nurhaliza,X-1,${ta}`,
+      `12347,Budi Santoso,XI-2,${ta}`,
     ].join('\n');
     const csv  = header + '\n' + contoh;
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -137,12 +146,12 @@ class SiswaModule {
     const rows = lines.slice(1).map((line, i) => {
       const cols = line.split(',').map(c => c.trim());
       return {
-        no          : i + 1,
-        nis         : cols[0] || '',
-        nama        : cols[1] || '',
-        kelas       : cols[2] || '',
-        keterangan  : cols[3] || '',
-        valid       : !!(cols[0] && cols[1] && cols[2]),
+        no        : i + 1,
+        nis       : cols[0] || '',
+        nama      : cols[1] || '',
+        kelas     : cols[2] || '',
+        tahunAjar : cols[3] || '',
+        valid     : !!(cols[0] && cols[1] && cols[2] && cols[3]),
       };
     });
     this._batchRows = rows;
@@ -164,7 +173,7 @@ class SiswaModule {
       <table style="width:100%;border-collapse:collapse;font-size:11px">
         <thead style="position:sticky;top:0;background:var(--surface2)">
           <tr>
-            ${['#','NIS','Nama','Kelas','Ket','Status'].map(h =>
+            ${['#','NIS','Nama','Kelas','TA','Status'].map(h =>
               `<th style="padding:6px 8px;text-align:left;font-weight:700;color:var(--text3);border-bottom:1px solid var(--border)">${h}</th>`
             ).join('')}
           </tr>
@@ -176,7 +185,7 @@ class SiswaModule {
             <td style="padding:5px 8px;font-weight:600;color:var(--text)">${r.nis||'—'}</td>
             <td style="padding:5px 8px;color:var(--text)">${r.nama||'—'}</td>
             <td style="padding:5px 8px"><span class="badge blue" style="font-size:10px">${r.kelas||'—'}</span></td>
-            <td style="padding:5px 8px;color:var(--text2)">${r.keterangan||''}</td>
+            <td style="padding:5px 8px;color:var(--text2)">${r.tahunAjar||'—'}</td>
             <td style="padding:5px 8px;font-size:10px;font-weight:700;color:${r.valid?'var(--success)':'var(--error)'}">
               ${r.valid ? '✓ OK' : '✗ Lengkapi'}
             </td>
@@ -198,7 +207,7 @@ class SiswaModule {
     UI.showLoading('Mengimport data siswa...');
     try {
       const res = await api.batchAddSiswa(validRows.map(r => ({
-        nis: r.nis, nama: r.nama, kelas: r.kelas, keterangan: r.keterangan,
+        nis: r.nis, nama: r.nama, kelas: r.kelas, tahunAjar: r.tahunAjar,
       })));
       if (res.status === 'ok') {
         let msg = `✓ ${res.berhasil} siswa berhasil diimport`;
@@ -291,12 +300,91 @@ class SiswaModule {
 
   // ── Private helpers ───────────────────────────────────────────────────────
   _readForm() {
+    const taAwal  = UI.$('siswaTaAwal')?.value || '';
+    const taAkhir = taAwal ? String(parseInt(taAwal) + 1) : '';
     return {
-      nis        : UI.$('siswaNis').value.trim(),
-      nama       : UI.$('siswaNama').value.trim(),
-      kelas      : UI.$('siswaKelas').value,
-      keterangan : UI.$('siswaKet').value.trim(),
+      nis       : UI.$('siswaNis').value.trim(),
+      nama      : UI.$('siswaNama').value.trim(),
+      kelas     : UI.$('siswaKelas').value,
+      tahunAjar : taAwal && taAkhir ? `${taAwal}/${taAkhir}` : '',
     };
+  }
+
+  // ── Kelas Dropdown ────────────────────────────────────────────────────────
+  /**
+   * Isi dropdown kelas dari data siswa aktif yang sudah ada.
+   * Jika selected diberikan (mode edit), pastikan nilainya terpilih
+   * dan tampilkan note jika tidak ada di data existing.
+   */
+  _populateKelasDropdown(selected = '') {
+    const kelasSet = [...new Set(
+      this.data.filter(s => (s.status || 'aktif') !== 'nonaktif').map(s => s.kelas)
+    )].sort();
+
+    const sel = UI.$('siswaKelas');
+    sel.innerHTML = '<option value="">— Pilih Kelas —</option>' +
+      kelasSet.map(k =>
+        `<option value="${k}" ${k === selected ? 'selected' : ''}>${k}</option>`
+      ).join('');
+
+    // Jika selected ada tapi tidak ada di kelasSet, tambahkan sebagai opsi "(kelas baru)"
+    if (selected && !kelasSet.includes(selected)) {
+      const opt = document.createElement('option');
+      opt.value    = selected;
+      opt.text     = `${selected} ✦ (kelas baru)`;
+      opt.selected = true;
+      opt.dataset.baru = 'true';
+      sel.appendChild(opt);
+    }
+
+    // Reset note & manual input
+    UI.$('siswaKelasBaruNote').style.display = 'none';
+    if (UI.$('siswaKelasManual')) UI.$('siswaKelasManual').value = '';
+
+    // Tampilkan note jika pilihan saat ini adalah kelas baru
+    sel.onchange = () => this._onKelasChange();
+    this._onKelasChange();
+  }
+
+  /** Tampilkan/sembunyikan note kelas baru saat dropdown berubah */
+  _onKelasChange() {
+    const sel      = UI.$('siswaKelas');
+    const note     = UI.$('siswaKelasBaruNote');
+    const selected = sel.options[sel.selectedIndex];
+    if (selected && selected.dataset.baru === 'true') {
+      note.style.display = '';
+    } else {
+      note.style.display = 'none';
+    }
+  }
+
+  /** Tambahkan kelas baru dari input manual ke dropdown */
+  _addKelasManual() {
+    const input = UI.$('siswaKelasManual');
+    const val   = input.value.trim().toUpperCase();
+    if (!val) { UI.showToast('Ketik nama kelas terlebih dahulu', 'error'); return; }
+
+    const sel = UI.$('siswaKelas');
+
+    // Cek apakah sudah ada di dropdown
+    const sudahAda = [...sel.options].some(o => o.value === val);
+    if (sudahAda) {
+      sel.value = val;
+      input.value = '';
+      this._onKelasChange();
+      return;
+    }
+
+    // Tambahkan sebagai opsi baru dengan marker
+    const opt = document.createElement('option');
+    opt.value        = val;
+    opt.text         = `${val} ✦ (kelas baru)`;
+    opt.selected     = true;
+    opt.dataset.baru = 'true';
+    sel.appendChild(opt);
+    input.value = '';
+    this._onKelasChange();
+    UI.showToast(`Kelas "${val}" ditambahkan`, 'info');
   }
 
   _switchTab(tab) {
@@ -314,12 +402,16 @@ class SiswaModule {
   }
 
   _clearForm() {
-    ['siswaNis','siswaNama','siswaKet'].forEach(id => UI.$(id).value = '');
-    UI.$('siswaKelas').value = '';
+    ['siswaNis', 'siswaNama'].forEach(id => {
+      const el = UI.$(id);
+      if (el) el.value = '';
+    });
+    // Reset dropdown kelas (isi ulang dari data, tanpa selection)
+    this._populateKelasDropdown();
+    TahunAjar.populateInputPair('siswaTaAwal', 'siswaTaAkhirLabel');
+    // Reset NIS ke mode editable
+    const nisInput = UI.$('siswaNis');
+    if (nisInput) nisInput.readOnly = false;
     this._batchRows = [];
-    const prev = UI.$('batchPreview');
-    if (prev) prev.innerHTML = '';
-    const fileInp = UI.$('batchFileInput');
-    if (fileInp) fileInp.value = '';
   }
 }

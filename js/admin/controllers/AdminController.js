@@ -55,14 +55,20 @@ class AdminController {
       dashboard: () => this.dashboard.load(),
       guru:      () => this.guru.load(),
       siswa:     () => this.siswa.load(),
-      nilai:     () => Promise.all([this.guru.load(), this.siswa.load()])
-                         .then(() => this.nilai.populateFilterSelects(
-                           this.guru.data, this.siswa.data
-                         )),
-      export:    () => Promise.all([this.guru.load(), this.siswa.load()])
-                         .then(() => this.nilai.populateFilterSelects(
-                           this.guru.data, this.siswa.data
-                         )),
+      nilai:     () => Promise.all([this.guru.load(), this.siswa.load(), api.getAvailableTahunAjar()])
+                         .then(([,, taRes]) => {
+                           const list = taRes.status === 'ok' ? taRes.tahunList : [];
+                           this.nilai.populateFilterSelects(this.guru.data, this.siswa.data);
+                           TahunAjar.populateFromServer('fNilaiTahun',  list, '', true);
+                           TahunAjar.populateFromServer('fExportTahun', list, '', true);
+                         }),
+      export:    () => Promise.all([this.guru.load(), this.siswa.load(), api.getAvailableTahunAjar()])
+                         .then(([,, taRes]) => {
+                           const list = taRes.status === 'ok' ? taRes.tahunList : [];
+                           this.nilai.populateFilterSelects(this.guru.data, this.siswa.data);
+                           TahunAjar.populateFromServer('fNilaiTahun',  list, '', true);
+                           TahunAjar.populateFromServer('fExportTahun', list, '', true);
+                         }),
       history:   () => this.history.load(),
     };
     loaders[id]?.();

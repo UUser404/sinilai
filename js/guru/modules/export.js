@@ -17,6 +17,12 @@ class ExportModule {
     this._guru = guru;
   }
 
+  /** Dipanggil setelah renderPage() dimasukkan ke DOM */
+  afterRender() {
+    TahunAjar.populate('expTahun', '', true);
+    App.absensiMod?.afterRender();
+  }
+
   /** Render halaman export — isi dropdown sesuai mapel/kelas guru */
   renderPage() {
     if (!this._guru) return;
@@ -41,9 +47,7 @@ class ExportModule {
               <label>Tahun Ajaran</label>
               <select id="expTahun" class="export-select">
                 <option value="">— Semua Tahun —</option>
-                <option>2024/2025</option>
-                <option>2025/2026</option>
-                <option>2026/2027</option>
+                <!-- populated by TahunAjar -->
               </select>
             </div>
             <div class="export-field">

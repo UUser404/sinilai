@@ -57,8 +57,9 @@ class ApiService {
   addSiswa(data)           { return this._http.post({ action: 'addSiswa' }, data); }
   editSiswa(data)          { return this._http.post({ action: 'editSiswa' }, data); }
   deleteSiswa(nis, hapusNilai) { return this._http.post({ action: 'deleteSiswa' }, { nis, hapusNilai }); }
-  getNilaiCountSiswa(nis)  { return this._http.get({ action: 'getNilaiCountSiswa', nis }); }
-  batchAddSiswa(siswaList) { return this._http.post({ action: 'batchAddSiswa' }, { siswaList }); }
+  getNilaiCountSiswa(nis)      { return this._http.get({ action: 'getNilaiCountSiswa', nis }); }
+  batchAddSiswa(siswaList)     { return this._http.post({ action: 'batchAddSiswa' }, { siswaList }); }
+  getAvailableTahunAjar()      { return this._http.get({ action: 'getAvailableTahunAjar' }); }
 
   deleteHistory(hari)      { return this._http.post({ action: 'deleteHistory' }, { hari }); }
 

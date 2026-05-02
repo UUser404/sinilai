@@ -42,7 +42,7 @@ class GuruController {
 
     if (pageId === 'dashboard') this.analisis.renderDashboard();
     if (pageId === 'ranking')   this.analisis.renderRanking();
-    if (pageId === 'export')    this.exportMod.renderPage();
+    if (pageId === 'export')    { this.exportMod.renderPage(); this.exportMod.afterRender(); }
     if (pageId === 'profil')    this.profilMod.render();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -62,7 +62,7 @@ class GuruController {
     if (pageId === 'home')      this.homeMod.render();
     if (pageId === 'dashboard') this.analisis.renderDashboard();
     if (pageId === 'ranking')   this.analisis.renderRanking();
-    if (pageId === 'export')    this.exportMod.renderPage();
+    if (pageId === 'export')    { this.exportMod.renderPage(); this.exportMod.afterRender(); }
     if (pageId === 'profil')    this.profilMod.render();
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -209,6 +209,13 @@ class GuruController {
     UI.$('userAvatar').textContent     = Formatter.inisial(guru.nama);
     this._populateSelects();
     this._restoreGroupStates();
+    // Populate dropdown tahun ajar dari server + generate lokal
+    api.getAvailableTahunAjar().then(res => {
+      const list = res.status === 'ok' ? res.tahunList : [];
+      TahunAjar.populateFromServer('ctxTahun', list, '', true);
+    }).catch(() => {
+      TahunAjar.populate('ctxTahun', '', true);
+    });
 
     // Pilih halaman awal sesuai ukuran layar
     if (window.innerWidth <= 768) {
@@ -304,7 +311,13 @@ class GuruController {
 
     const ctx = sessionService.loadKonteks();
     if (!ctx) return;
-    UI.$('ctxTahun').value    = ctx.tahun    || '';
+    // Populate dropdown tahun dulu, baru restore nilai
+    api.getAvailableTahunAjar().then(res => {
+      const list = res.status === 'ok' ? res.tahunList : [];
+      TahunAjar.populateFromServer('ctxTahun', list, ctx.tahun || '', true);
+    }).catch(() => {
+      TahunAjar.populate('ctxTahun', ctx.tahun || '', true);
+    });
     UI.$('ctxSemester').value = ctx.semester || '';
     setTimeout(() => {
       UI.$('ctxMapel').value = ctx.mapel || '';
