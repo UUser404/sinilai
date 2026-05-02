@@ -1,0 +1,25 @@
+{
+  "name": "SiNilai — Portal Guru",
+  "short_name": "SiNilai",
+  "description": "Aplikasi input dan monitoring nilai siswa",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#1a73e8",
+  "theme_color": "#1a73e8",
+  "lang": "id",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
